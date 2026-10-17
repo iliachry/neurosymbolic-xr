@@ -119,12 +119,11 @@ I've provided a detailed scene-by-scene script in [`VIDEO_SCRIPT.md`](VIDEO_SCRI
 
 ### 7. Call to Action (3:20-3:40)
 - **Visuals Needed**:
-  - GitHub repository mockup
-  - Documentation website preview
-  - Social links (Discord, Twitter)
-  - QR codes for easy access
+  - GitHub repository (`https://github.com/iliachry/neurosymbolic-xr`)
+  - Architecture and Quickstart documentation in repository
+  - Repository module breakdown
 - **Style**: Clean, professional
-- **Text Overlays**: URLs and contact info
+- **Text Overlays**: Repository URL and module structure
 
 ### 8. Closing (3:40-3:50)
 - **Concept**: Return to opening neural→symbolic animation

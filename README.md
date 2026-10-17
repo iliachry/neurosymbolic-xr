@@ -304,22 +304,14 @@ neurosymbolic-xr/
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/neurosymbolic-xr.git
+git clone https://github.com/iliachry/neurosymbolic-xr.git
 cd neurosymbolic-xr
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install dependencies with uv
+uv sync
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Download pre-trained models
-python scripts/download_models.py
-
-# Install symbolic reasoning engines
-# SWI-Prolog: https://www.swi-prolog.org/download/stable
-# Z3: pip install z3-solver (already in requirements.txt)
+# Run interactive demonstration
+uv run python demo.py
 ```
 
 ### Basic Usage
@@ -393,23 +385,20 @@ This framework implements concepts from:
 - **SAM 2** (Ravi et al., 2024)
 - **ORB-SLAM3** (Campos et al., 2021)
 - **Neurosymbolic AI** (Garcez et al., 2019)
-- **Spatial Computing** (Chrysovergis, 2026)
+- **ExpertAssist: An "On-the-Job" Augmented Reality Toolkit for Assistance in the Construction Industry** (Chrysovergis et al., *Computers & Education: X Reality*, 2026, [DOI: 10.1016/j.cexr.2026.100155](https://doi.org/10.1016/j.cexr.2026.100155))
+- **Metaverse Framework for Wireless Systems Management** (Chrysovergis et al., *IEEE Internet of Things Magazine*, 2026, [DOI: 10.1109/MIOT.2026.3680843](https://doi.org/10.1109/MIOT.2026.3680843))
+- **Less Is More: Efficient Networked VR Transformation Handling Using Geometric Algebra** (Kamarianakis, Chrysovergis et al., *Advances in Applied Clifford Algebras*, 2023, [DOI: 10.1007/s00006-022-01253-9](https://doi.org/10.1007/s00006-022-01253-9))
 
 ## 📖 Documentation
 
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Neural Components Guide](docs/NEURAL_COMPONENTS.md)
-- [Symbolic Components Guide](docs/SYMBOLIC_COMPONENTS.md)
-- [Integration Guide](docs/INTEGRATION_GUIDE.md)
-- [API Reference](docs/API_REFERENCE.md)
-
-## 🤝 Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- [Architecture Overview](ARCHITECTURE.md)
+- [Quick Start Guide](QUICKSTART.md)
+- [Project Summary](PROJECT_SUMMARY.md)
+- [Video Script](VIDEO_SCRIPT.md)
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License
 
 ## 🙏 Acknowledgments
 
@@ -420,10 +409,10 @@ Built upon research from:
 - Khronos Group (OpenXR)
 - Poetics VR Platform
 
-## 📧 Contact
+## 🔗 Repository
 
-For questions or collaboration: [your-email@example.com]
+- GitHub: [https://github.com/iliachry/neurosymbolic-xr](https://github.com/iliachry/neurosymbolic-xr)
 
 ---
 
-**Status**: 🚧 Active Development | **Version**: 0.1.0-alpha | **Last Updated**: 2026-10-17
+**Status**: Active Development | **Version**: 0.1.0 | **Last Updated**: 2026-10-17

@@ -359,7 +359,7 @@ async def main():
     print("  • Integration guides - Poetics platform integration")
     
     print("\nThank you for exploring the Neurosymbolic XR Framework!")
-    print("For questions: https://github.com/your-org/neurosymbolic-xr")
+    print("Repository: https://github.com/iliachry/neurosymbolic-xr")
     print("\n" + "█" * 80 + "\n")
 
 

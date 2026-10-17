@@ -103,7 +103,7 @@ MAIN_SCENES = [
         "title": "Call to Action",
         "min_duration": 16.0,
         "lead_in": 0.8,
-        "vo": "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI."
+        "vo": "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit the GitHub repository for the source code, architecture documentation, and interactive demo. Transform your VR applications with the power of neurosymbolic AI."
     },
     {
         "id": 11,
@@ -153,6 +153,8 @@ SOCIAL_CUTS = {
 
 
 def run_tts(text: str, out_mp3: Path, rate: str = "+0%"):
+    if out_mp3.exists() and out_mp3.stat().st_size > 1000:
+        return
     cmd = [
         "uvx", "edge-tts",
         "--voice", VOICE,

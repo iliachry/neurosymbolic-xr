@@ -133,7 +133,7 @@ let TIMELINE = {
       { id: 7, key: 'poetics_integration', title: 'Poetics Platform Integration', start: 115, end: 133, duration: 18, vo_text: "All four systems integrate seamlessly with the Poetics VR platform. A unified API manages sessions, tracks users, stores semantic memory in Supabase, and provides real-time events. Everything you need for intelligent VR experiences." },
       { id: 8, key: 'performance_metrics', title: 'Performance Metrics', start: 133, end: 147, duration: 14, vo_text: "Performance is critical for XR. The framework achieves sub-20 millisecond tracking latency, real-time scene understanding, and fast asset generation—all while running complex AI models." },
       { id: 9, key: 'tech_stack', title: 'Technical Stack', start: 147, end: 162, duration: 15, vo_text: "Built on cutting-edge technologies: 3D Gaussian Splatting for rendering, SAM 2 for segmentation, CLIP for grounding, and Stable Diffusion for generation. Symbolic reasoning with RDF, Prolog, and Z3. All integrated with Supabase and OpenXR." },
-      { id: 10, key: 'call_to_action', title: 'Call to Action', start: 162, end: 178, duration: 16, vo_text: "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI." },
+      { id: 10, key: 'call_to_action', title: 'Call to Action', start: 162, end: 178, duration: 16, vo_text: "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit the GitHub repository for the source code, architecture documentation, and interactive demo. Transform your VR applications with the power of neurosymbolic AI." },
       { id: 11, key: 'closing', title: 'Closing', start: 178, end: 186, duration: 8, vo_text: "Neurosymbolic XR Framework. The future of intelligent Extended Reality." }
     ]
   },
@@ -1312,7 +1312,7 @@ function renderSceneTechStack(p, globalTime) {
 }
 
 // ============================================================================
-// SCENE 10: CALL TO ACTION (GitHub, Docs, Quickstart & QR Code)
+// SCENE 10: CALL TO ACTION (Verified GitHub Repository & Real Package Structure)
 // ============================================================================
 function renderSceneCTA(p, globalTime) {
   ctx.save();
@@ -1331,7 +1331,7 @@ function renderSceneCTA(p, globalTime) {
   // Quickstart Terminal Box
   drawRoundedRect(115, 325, 1050, 270, 16, '#0b0e17', 'rgba(255,255,255,0.15)', 1.5);
   const cli = [
-    '$ git clone https://github.com/poetics-vr/neurosymbolic-xr.git',
+    '$ git clone https://github.com/iliachry/neurosymbolic-xr.git',
     '$ cd neurosymbolic-xr && uv sync',
     '$ uv run python demo.py',
     '✓ Spatial Reasoning Engine initialized (3DGS + SAM 2 + CLIP + RDF)',
@@ -1344,11 +1344,11 @@ function renderSceneCTA(p, globalTime) {
     ctx.fillText(cli[i], 145, 372 + i * 38);
   }
 
-  // Resource Links
+  // Verified Online Repository Links Only
   const links = [
-    ['💻 GitHub Repository:', 'github.com/poetics-vr/neurosymbolic-xr'],
-    ['📚 Documentation:', 'docs.neurosymbolic-xr.org'],
-    ['💬 Community Discord:', 'discord.gg/neurosymbolic-xr']
+    ['💻 GitHub Repository:', 'https://github.com/iliachry/neurosymbolic-xr'],
+    ['📐 Architecture Spec:', 'github.com/iliachry/neurosymbolic-xr/blob/main/ARCHITECTURE.md'],
+    ['🚀 Quickstart & Demo:', 'github.com/iliachry/neurosymbolic-xr/blob/main/QUICKSTART.md']
   ];
   for (let i = 0; i < links.length; i++) {
     const ly = 640 + i * 75;
@@ -1356,46 +1356,37 @@ function renderSceneCTA(p, globalTime) {
     ctx.font = `700 20px ${FONTS.body}`;
     ctx.fillStyle = COLORS.symbolic;
     ctx.fillText(links[i][0], 145, ly + 37);
-    ctx.font = `600 20px ${FONTS.code}`;
+    ctx.font = `600 19px ${FONTS.code}`;
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(links[i][1], 430, ly + 37);
+    ctx.fillText(links[i][1], 405, ly + 37);
   }
 
-  // Right Card: Stylized QR Code & Architecture Summary
+  // Right Card: Verified Repository Modules (No fake QR code)
   drawRoundedRect(1240, 125, 600, 780, 22, 'rgba(18, 22, 34, 0.95)', COLORS.symbolic, 2.2);
-  ctx.textAlign = 'center';
-  ctx.font = `800 28px ${FONTS.title}`;
+  ctx.textAlign = 'left';
+  ctx.font = `800 26px ${FONTS.title}`;
   ctx.fillStyle = COLORS.symbolic;
-  ctx.fillText('SCAN FOR QUICKSTART', 1540, 195);
+  ctx.fillText('REPOSITORY MODULES', 1280, 190);
 
-  // Stylized deterministic QR Matrix
-  const qrSize = 320;
-  const qx = 1540 - qrSize / 2;
-  const qy = 235;
-  drawRoundedRect(qx - 20, qy - 20, qrSize + 40, qrSize + 40, 18, '#FFFFFF', null);
-  const cells = 21;
-  const cellW = qrSize / cells;
-  ctx.fillStyle = '#0f172a';
-  for (let r = 0; r < cells; r++) {
-    for (let c = 0; c < cells; c++) {
-      const isCorner = (r < 7 && c < 7) || (r < 7 && c >= cells - 7) || (r >= cells - 7 && c < 7);
-      if (isCorner) {
-        if (r === 0 || r === 6 || c === 0 || c === 6 || r === cells - 1 || r === cells - 7 || c === cells - 1 || c === cells - 7 || (r >= 2 && r <= 4 && c >= 2 && c <= 4) || (r >= 2 && r <= 4 && c >= cells - 5 && c <= cells - 3) || (r >= cells - 5 && r <= cells - 3 && c >= 2 && c <= 4)) {
-          ctx.fillRect(qx + c * cellW, qy + r * cellW, cellW + 0.5, cellW + 0.5);
-        }
-      } else if (seededRandom(r * 31 + c * 17) > 0.46) {
-        ctx.fillRect(qx + c * cellW, qy + r * cellW, cellW + 0.5, cellW + 0.5);
-      }
-    }
+  const repoModules = [
+    ['src/core/bridge.py', 'Bidirectional neural ⇄ symbolic grounding'],
+    ['src/neural/', '3DGS, SAM 2 & CLIP perception modules'],
+    ['src/systems/spatial_reasoning.py', 'RDF scene graphs & SPARQL queries'],
+    ['src/systems/hybrid_slam.py', 'ORB-SLAM3 + persistent semantic memory'],
+    ['src/systems/training_assistant.py', '21-joint hand pose + Prolog validation'],
+    ['src/systems/asset_generator.py', 'Z3 SMT solver + 3D diffusion synthesis'],
+    ['src/integration/poetics.py', 'Poetics VR & Supabase session engine']
+  ];
+  for (let i = 0; i < repoModules.length; i++) {
+    const my = 225 + i * 92;
+    drawRoundedRect(1275, my, 530, 78, 12, 'rgba(28, 34, 52, 0.88)', 'rgba(255,255,255,0.1)', 1.2);
+    ctx.font = `700 17px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.success;
+    ctx.fillText(repoModules[i][0], 1295, my + 32);
+    ctx.font = `500 15px ${FONTS.body}`;
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText(repoModules[i][1], 1295, my + 60);
   }
-
-  ctx.font = `700 22px ${FONTS.title}`;
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText('Poetics VR Platform', 1540, 645);
-  ctx.font = `500 18px ${FONTS.body}`;
-  ctx.fillStyle = COLORS.textMuted;
-  ctx.fillText('Transform your XR venues with', 1540, 685);
-  ctx.fillText('neural perception + symbolic reasoning.', 1540, 715);
   ctx.restore();
 }
 

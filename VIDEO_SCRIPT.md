@@ -281,23 +281,21 @@ session = await integration.start_session(
 ## Scene 10: Call to Action (3:20 - 3:40)
 
 ### Visual
-- GitHub repository page
-- Documentation links
+- GitHub repository page (`https://github.com/iliachry/neurosymbolic-xr`)
+- Architecture and Quickstart documentation in repository
 - Quick start code snippet
-- Discord community invite
-- Contact information
+- Repository module overview
 
 ### Text Overlays
 ```
 🚀 Get Started Today
-📚 Documentation: docs.neurosymbolic-xr.org
-💻 GitHub: github.com/your-org/neurosymbolic-xr
-💬 Discord: discord.gg/neurosymbolic-xr
-📧 Contact: support@neurosymbolic-xr.org
+💻 GitHub: https://github.com/iliachry/neurosymbolic-xr
+📐 Architecture: ARCHITECTURE.md
+🚀 Quickstart: QUICKSTART.md
 ```
 
 ### Voiceover
-*"Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI."*
+*"Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit the GitHub repository for the source code, architecture documentation, and interactive demo. Transform your VR applications with the power of neurosymbolic AI."*
 
 ### Technical Notes
 - Show GitHub stars/forks counter

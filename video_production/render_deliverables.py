@@ -84,6 +84,8 @@ async def render_video_mode(page, mode: str, duration: float, audio_path: str, o
 
 
 async def main():
+    import sys
+    main_only = "--main-only" in sys.argv
     timings_path = BASE_DIR / "scene_timings.json"
     timings = json.loads(timings_path.read_text(encoding="utf-8"))
 
@@ -112,29 +114,43 @@ async def main():
             await page.locator("#stage").screenshot(path=str(still_path))
         print(f"[Renderer] ✓ Saved all 11 scene preview stills to {PREVIEWS_DIR}")
 
-        # 3. Render 15s, 30s, 60s cuts and Main Showcase
-        for cut_key, filename in [
-            ("15s", "neurosymbolic_xr_15s_cut.mp4"),
-            ("30s", "neurosymbolic_xr_30s_cut.mp4"),
-            ("60s", "neurosymbolic_xr_60s_cut.mp4"),
-        ]:
-            cut_meta = timings["cuts"][cut_key]
-            await render_video_mode(
-                page,
-                mode=cut_key,
-                duration=cut_meta["total_duration"],
-                audio_path=cut_meta["audio_path"],
-                out_mp4=DELIVERABLES_DIR / filename
-            )
+        # 3. Render 15s, 30s, 60s cuts (unless --main-only)
+        if not main_only:
+            for cut_key, filename in [
+                ("15s", "neurosymbolic_xr_15s_cut.mp4"),
+                ("30s", "neurosymbolic_xr_30s_cut.mp4"),
+                ("60s", "neurosymbolic_xr_60s_cut.mp4"),
+            ]:
+                cut_meta = timings["cuts"][cut_key]
+                await render_video_mode(
+                    page,
+                    mode=cut_key,
+                    duration=cut_meta["total_duration"],
+                    audio_path=cut_meta["audio_path"],
+                    out_mp4=DELIVERABLES_DIR / filename
+                )
 
         main_meta = timings["main"]
+        master_mp4 = DELIVERABLES_DIR / "neurosymbolic_xr_showcase.mp4"
         await render_video_mode(
             page,
             mode="main",
             duration=main_meta["total_duration"],
             audio_path=main_meta["audio_path"],
-            out_mp4=DELIVERABLES_DIR / "neurosymbolic_xr_showcase.mp4"
+            out_mp4=master_mp4
         )
+
+        # 4. Also produce <20MB compressed showcase
+        compressed_mp4 = DELIVERABLES_DIR / "neurosymbolic_xr_showcase_compressed.mp4"
+        print(f"[Renderer] Compressing {master_mp4.name} -> {compressed_mp4.name} (<20MB)...")
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(master_mp4),
+            "-c:v", "libx264", "-preset", "slow", "-crf", "25", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
+            str(compressed_mp4)
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        comp_mb = compressed_mp4.stat().st_size / (1024 * 1024)
+        print(f"[Renderer] ✓ Saved compressed showcase: {compressed_mp4.name} ({comp_mb:.2f} MB)")
 
         await browser.close()
 

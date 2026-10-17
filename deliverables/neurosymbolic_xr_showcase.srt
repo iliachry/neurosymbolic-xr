@@ -35,9 +35,9 @@ Performance is critical for XR. The framework achieves sub-20 millisecond tracki
 Built on cutting-edge technologies: 3D Gaussian Splatting for rendering, SAM 2 for segmentation, CLIP for grounding, and Stable Diffusion for generation. Symbolic reasoning with RDF, Prolog, and Z3. All integrated with Supabase and OpenXR.
 
 10
-00:02:47,560 --> 00:03:03,355
-Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI.
+00:02:47,560 --> 00:03:04,929
+Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit the GitHub repository for the source code, architecture documentation, and interactive demo. Transform your VR applications with the power of neurosymbolic AI.
 
 11
-00:03:05,260 --> 00:03:10,315
+00:03:06,830 --> 00:03:11,885
 Neurosymbolic XR Framework. The future of intelligent Extended Reality.

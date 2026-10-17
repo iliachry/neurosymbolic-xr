@@ -1,6 +1,6 @@
 {
   "main": {
-    "total_duration": 192.46,
+    "total_duration": 194.03,
     "audio_path": "/Users/iliaschrysovergis/Desktop/neurosymbolic-xr/video_production/audio/main_showcase_mix.wav",
     "scenes": [
       {
@@ -116,22 +116,22 @@
         "key": "call_to_action",
         "title": "Call to Action",
         "start": 166.76,
-        "end": 184.46,
-        "duration": 17.7,
+        "end": 186.03,
+        "duration": 19.27,
         "vo_start": 167.56,
-        "vo_end": 183.355,
-        "vo_duration": 15.795,
-        "vo_text": "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI."
+        "vo_end": 184.929,
+        "vo_duration": 17.369,
+        "vo_text": "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit the GitHub repository for the source code, architecture documentation, and interactive demo. Transform your VR applications with the power of neurosymbolic AI."
       },
       {
         "id": 11,
         "key": "closing",
         "title": "Closing",
-        "start": 184.46,
-        "end": 192.46,
+        "start": 186.03,
+        "end": 194.03,
         "duration": 8.0,
-        "vo_start": 185.26,
-        "vo_end": 190.315,
+        "vo_start": 186.83,
+        "vo_end": 191.885,
         "vo_duration": 5.055,
         "vo_text": "Neurosymbolic XR Framework. The future of intelligent Extended Reality."
       }

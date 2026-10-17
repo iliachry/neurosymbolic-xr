@@ -6,7 +6,7 @@ This guide will help you get started with the Neurosymbolic XR Framework.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/neurosymbolic-xr.git
+git clone https://github.com/iliachry/neurosymbolic-xr.git
 cd neurosymbolic-xr
 
 # Create virtual environment
@@ -298,10 +298,8 @@ pip install -r requirements.txt --force-reinstall
 - Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for technical details
 - Explore [`demo.py`](demo.py) for complete examples
 - Check API documentation in source code docstrings
-- Join our community: https://discord.gg/neurosymbolic-xr
 
 ## Support
 
-- GitHub Issues: https://github.com/your-org/neurosymbolic-xr/issues
-- Documentation: https://docs.neurosymbolic-xr.org
-- Email: support@neurosymbolic-xr.org
+- GitHub Repository: https://github.com/iliachry/neurosymbolic-xr
+- GitHub Issues: https://github.com/iliachry/neurosymbolic-xr/issues

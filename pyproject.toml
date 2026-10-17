@@ -63,10 +63,9 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/neurosymbolic-xr"
-Documentation = "https://neurosymbolic-xr.readthedocs.io"
-Repository = "https://github.com/yourusername/neurosymbolic-xr"
-Issues = "https://github.com/yourusername/neurosymbolic-xr/issues"
+Homepage = "https://github.com/iliachry/neurosymbolic-xr"
+Repository = "https://github.com/iliachry/neurosymbolic-xr"
+Issues = "https://github.com/iliachry/neurosymbolic-xr/issues"
 
 [project.scripts]
 nxr = "neurosymbolic_xr.cli:main"
