@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Neurosymbolic XR Framework — Video Production Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0f14;
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    body.headless {
+      background: #000;
+      display: block;
+    }
+    #stage-wrap {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.8);
+      background: #141720;
+      overflow: hidden;
+    }
+    body.headless #stage-wrap {
+      box-shadow: none;
+    }
+    canvas#stage {
+      width: 1920px;
+      height: 1080px;
+      display: block;
+    }
+    #controls {
+      margin-top: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: rgba(26, 29, 40, 0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 10px 18px;
+      border-radius: 12px;
+      z-index: 100;
+    }
+    body.headless #controls {
+      display: none !important;
+    }
+    button, select {
+      background: #1E90FF;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    select { background: #262b3d; }
+    input[type="range"] { width: 420px; accent-color: #FFD700; }
+    .time-label { font-family: 'Fira Code', monospace; font-size: 13px; color: #cbd5e1; min-width: 120px; }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap">
+    <canvas id="stage" width="1920" height="1080"></canvas>
+  </div>
+  <div id="controls">
+    <button id="play-btn">▶ Play</button>
+    <select id="mode-select">
+      <option value="main">Main Video (11 Scenes)</option>
+      <option value="60s">60s Social Cut</option>
+      <option value="30s">30s Teaser Cut</option>
+      <option value="15s">15s Reels/Stories Cut</option>
+      <option value="thumbnail">YouTube Thumbnail (1920x1080)</option>
+    </select>
+    <input type="range" id="scrub" min="0" max="186" step="0.033" value="0" />
+    <span class="time-label" id="time-display">00:00.0 / 03:06.0</span>
+  </div>
+
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const W = 1920;
+const H = 1080;
+
+// Check URL params for headless mode
+const params = new URLSearchParams(window.location.search);
+if (params.get('headless') === '1') {
+  document.body.classList.add('headless');
+}
+
+// Style Guide Colors from ANTIGRAVITY_BRIEF.md
+const COLORS = {
+  bgDark: '#12141c',
+  bgPanel: '#1a1d28',
+  bgCard: 'rgba(26, 30, 44, 0.88)',
+  neural: '#1E90FF',
+  neuralLight: '#60B5FF',
+  neuralGlow: 'rgba(30, 144, 255, 0.35)',
+  symbolic: '#FFD700',
+  symbolicLight: '#FFE55C',
+  symbolicGlow: 'rgba(255, 215, 0, 0.35)',
+  success: '#00FF66',
+  successGlow: 'rgba(0, 255, 102, 0.3)',
+  textMain: '#FFFFFF',
+  textMuted: '#94A3B8',
+  textDim: '#64748B',
+  border: 'rgba(255, 255, 255, 0.12)'
+};
+
+const FONTS = {
+  title: "'Montserrat', 'Inter', -apple-system, sans-serif",
+  body: "'Inter', -apple-system, sans-serif",
+  code: "'Fira Code', 'JetBrains Mono', 'Menlo', monospace"
+};
+
+// Default fallback timeline if scene_timings.json isn't injected yet
+let TIMELINE = {
+  main: {
+    total_duration: 186.0,
+    scenes: [
+      { id: 1, key: 'opening', title: 'Opening Title', start: 0, end: 10, duration: 10, vo_text: "Introducing the Neurosymbolic XR Framework—a breakthrough in Extended Reality AI that combines the power of deep learning with logical reasoning." },
+      { id: 2, key: 'architecture', title: 'Architecture Overview', start: 10, end: 27, duration: 17, vo_text: "The framework features a layered architecture. Sensors feed into neural networks for perception, which are grounded into symbolic representations for reasoning. This bidirectional bridge enables both bottom-up understanding and top-down validation." },
+      { id: 3, key: 'spatial_reasoning', title: 'System 1: Spatial Reasoning', start: 27, end: 49, duration: 22, vo_text: "System One: Spatial Reasoning. We capture the scene with 3D Gaussian Splatting, segment objects with SAM 2, and ground them to language with CLIP. The result? A queryable scene graph that understands both geometry and semantics." },
+      { id: 4, key: 'hybrid_slam', title: 'System 2: Hybrid SLAM', start: 49, end: 71, duration: 22, vo_text: "System Two: Hybrid SLAM. Visual-inertial tracking provides precise localization at 60 frames per second. But unlike traditional SLAM, we maintain semantic memory—objects are remembered across sessions, building a persistent understanding of the environment." },
+      { id: 5, key: 'training_assistant', title: 'System 3: VR Training Assistant', start: 71, end: 93, duration: 22, vo_text: "System Three: VR Training Assistant. Hand and gaze tracking feed into Prolog-based procedural reasoning. Each action is validated against logical preconditions and constraints, providing real-time feedback to guide users through complex procedures." },
+      { id: 6, key: 'asset_generator', title: 'System 4: Asset Generator', start: 93, end: 115, duration: 22, vo_text: "System Four: Neural-Symbolic Asset Generator. Natural language descriptions are combined with geometric constraints. Z3 validates feasibility, then Stable Diffusion generates the asset. The result? AI-created content that satisfies both aesthetic and functional requirements." },
+      { id: 7, key: 'poetics_integration', title: 'Poetics Platform Integration', start: 115, end: 133, duration: 18, vo_text: "All four systems integrate seamlessly with the Poetics VR platform. A unified API manages sessions, tracks users, stores semantic memory in Supabase, and provides real-time events. Everything you need for intelligent VR experiences." },
+      { id: 8, key: 'performance_metrics', title: 'Performance Metrics', start: 133, end: 147, duration: 14, vo_text: "Performance is critical for XR. The framework achieves sub-20 millisecond tracking latency, real-time scene understanding, and fast asset generation—all while running complex AI models." },
+      { id: 9, key: 'tech_stack', title: 'Technical Stack', start: 147, end: 162, duration: 15, vo_text: "Built on cutting-edge technologies: 3D Gaussian Splatting for rendering, SAM 2 for segmentation, CLIP for grounding, and Stable Diffusion for generation. Symbolic reasoning with RDF, Prolog, and Z3. All integrated with Supabase and OpenXR." },
+      { id: 10, key: 'call_to_action', title: 'Call to Action', start: 162, end: 178, duration: 16, vo_text: "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI." },
+      { id: 11, key: 'closing', title: 'Closing', start: 178, end: 186, duration: 8, vo_text: "Neurosymbolic XR Framework. The future of intelligent Extended Reality." }
+    ]
+  },
+  cuts: {}
+};
+
+window.setTimelineData = function(data) {
+  TIMELINE = data;
+};
+
+// Utility math & easing functions
+function clamp(v, min = 0, max = 1) { return Math.max(min, Math.min(max, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeOutCubic(t) { const x = clamp(t); return 1 - Math.pow(1 - x, 3); }
+function easeInOutCubic(t) {
+  const x = clamp(t);
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+function smoothStep(edge0, edge1, x) {
+  const t = clamp((x - edge0) / (edge1 - edge0));
+  return t * t * (3 - 2 * t);
+}
+
+// Deterministic pseudo-random generator
+function seededRandom(seed) {
+  let x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+// Precompute 3D particles & graph nodes for scenes
+const NODES_OPENING = [];
+for (let i = 0; i < 64; i++) {
+  const theta = seededRandom(i * 3 + 1) * Math.PI * 2;
+  const phi = Math.acos(2 * seededRandom(i * 3 + 2) - 1);
+  const r = 160 + seededRandom(i * 3 + 3) * 180;
+  // Neural cloud position (organic sphere)
+  const nx = r * Math.sin(phi) * Math.cos(theta);
+  const ny = r * Math.sin(phi) * Math.sin(theta) * 0.75;
+  const nz = r * Math.cos(phi);
+
+  // Symbolic graph position (structured hierarchical lattice)
+  const layer = i % 4;
+  const idxInLayer = Math.floor(i / 4);
+  const angle = (idxInLayer / 16) * Math.PI * 2;
+  const ringR = 95 + layer * 75;
+  const sx = Math.cos(angle) * ringR * 1.25;
+  const sy = (layer - 1.5) * 115 + Math.sin(angle * 2) * 22;
+  const sz = Math.sin(angle) * ringR * 0.6;
+
+  const labels = ['Entity', 'Table', 'Chair', 'Laptop', 'Stage', 'Door', 'ON(x,y)', 'NEAR(x,y)', 'Graspable', 'Sittable', 'Pose6D', 'Z3_Valid', 'PrologRule', 'SAM2_Mask', 'CLIP_Vec', 'Gaussian3D'];
+  NODES_OPENING.push({
+    nx, ny, nz, sx, sy, sz,
+    label: labels[i % labels.length],
+    isMajor: i % 5 === 0
+  });
+}
+
+// Precompute 3D Gaussian Splatting point cloud for Scene 3
+const SPLATS_3D = [];
+// Table surface + 4 legs + Chair + Laptop + Cup + Book
+for (let i = 0; i < 420; i++) {
+  let x, y, z, objType, color;
+  if (i < 170) {
+    // Table top & legs
+    objType = 'table';
+    color = '#1E90FF';
+    x = (seededRandom(i * 7) - 0.5) * 280;
+    z = (seededRandom(i * 7 + 1) - 0.5) * 180;
+    y = 40 + (seededRandom(i * 7 + 2) - 0.5) * 14;
+  } else if (i < 270) {
+    // Chair near table
+    objType = 'chair';
+    color = '#38BDF8';
+    x = -190 + (seededRandom(i * 7) - 0.5) * 90;
+    z = 40 + (seededRandom(i * 7 + 1) - 0.5) * 90;
+    y = (i < 220 ? 50 : -20) + (seededRandom(i * 7 + 2) - 0.5) * 55;
+  } else if (i < 350) {
+    // Laptop on table
+    objType = 'laptop';
+    color = '#00FF66';
+    x = -20 + (seededRandom(i * 7) - 0.5) * 75;
+    z = -10 + (seededRandom(i * 7 + 1) - 0.5) * 55;
+    y = 5 - seededRandom(i * 7 + 2) * 45;
+  } else if (i < 390) {
+    // Book on table
+    objType = 'book';
+    color = '#FFD700';
+    x = 75 + (seededRandom(i * 7) - 0.5) * 50;
+    z = 25 + (seededRandom(i * 7 + 1) - 0.5) * 40;
+    y = 25 + (seededRandom(i * 7 + 2) - 0.5) * 10;
+  } else {
+    // Cup on table
+    objType = 'cup';
+    color = '#F472B6';
+    x = 55 + (seededRandom(i * 7) - 0.5) * 28;
+    z = -35 + (seededRandom(i * 7 + 1) - 0.5) * 28;
+    y = 15 + (seededRandom(i * 7 + 2) - 0.5) * 30;
+  }
+  // Initial scattered position
+  const sx = (seededRandom(i * 11) - 0.5) * 520;
+  const sy = (seededRandom(i * 11 + 1) - 0.5) * 360;
+  const sz = (seededRandom(i * 11 + 2) - 0.5) * 420;
+  SPLATS_3D.push({ x, y, z, sx, sy, sz, objType, color, r: 4 + seededRandom(i * 13) * 6 });
+}
+
+// Drawing helpers
+function drawRoundedRect(x, y, w, h, r, fill, stroke, strokeWidth = 1.5) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  if (fill) {
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+  }
+}
+
+function drawGlowCircle(x, y, r, color, glowRadius = 20) {
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = glowRadius;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBadge(x, y, text, bgColor, textColor = '#fff', borderColor = null) {
+  ctx.save();
+  ctx.font = `700 15px ${FONTS.body}`;
+  const padX = 16;
+  const w = ctx.measureText(text).width + padX * 2;
+  const h = 34;
+  drawRoundedRect(x, y, w, h, 17, bgColor, borderColor || bgColor, 1.5);
+  ctx.fillStyle = textColor;
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x + padX, y + h / 2 + 1);
+  ctx.restore();
+  return w;
+}
+
+function drawBackground(globalTime) {
+  // Deep dark tech radial gradient (#1a1a1a base with subtle neural blue & symbolic gold ambient corners)
+  const grad = ctx.createRadialGradient(W * 0.5, H * 0.45, 100, W * 0.5, H * 0.5, W * 0.75);
+  grad.addColorStop(0, '#1e2230');
+  grad.addColorStop(0.6, '#151821');
+  grad.addColorStop(1, '#0e1017');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Ambient corner blooms
+  const blueGlow = ctx.createRadialGradient(250, 200, 10, 250, 200, 620);
+  blueGlow.addColorStop(0, 'rgba(30, 144, 255, 0.11)');
+  blueGlow.addColorStop(1, 'rgba(30, 144, 255, 0)');
+  ctx.fillStyle = blueGlow;
+  ctx.fillRect(0, 0, W, H);
+
+  const goldGlow = ctx.createRadialGradient(W - 250, H - 200, 10, W - 250, H - 200, 620);
+  goldGlow.addColorStop(0, 'rgba(255, 215, 0, 0.08)');
+  goldGlow.addColorStop(1, 'rgba(255, 215, 0, 0)');
+  ctx.fillStyle = goldGlow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle perspective grid
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+  ctx.lineWidth = 1;
+  const gridSize = 60;
+  const offset = (globalTime * 12) % gridSize;
+  for (let x = 0; x < W; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  for (let y = offset; y < H; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawTopBar(sceneId, sceneTitle, globalTime, totalDuration, mode) {
+  ctx.save();
+  drawRoundedRect(48, 28, W - 96, 64, 14, 'rgba(20, 24, 36, 0.85)', 'rgba(255, 255, 255, 0.1)', 1);
+
+  // Left logo pill
+  drawGlowCircle(82, 60, 10, COLORS.neural, 12);
+  drawGlowCircle(98, 60, 10, COLORS.symbolic, 12);
+  ctx.font = `800 20px ${FONTS.title}`;
+  ctx.fillStyle = '#fff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('NEUROSYMBOLIC XR', 122, 61);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillRect(365, 44, 1.5, 32);
+
+  // Scene indicator
+  ctx.font = `600 18px ${FONTS.body}`;
+  ctx.fillStyle = COLORS.symbolic;
+  const badgeText = mode === 'main' ? `SCENE ${String(sceneId).padStart(2, '0')} / 11` : `SHOWCASE (${mode.toUpperCase()})`;
+  ctx.fillText(badgeText, 388, 61);
+
+  ctx.font = `600 18px ${FONTS.body}`;
+  ctx.fillStyle = '#E2E8F0';
+  ctx.fillText(`—  ${sceneTitle}`, 545, 61);
+
+  // Right status & progress
+  const pct = clamp(globalTime / Math.max(1, totalDuration));
+  const barW = 240;
+  const barX = W - 96 - barW - 30;
+  const barY = 55;
+  drawRoundedRect(barX, barY, barW, 10, 5, 'rgba(255,255,255,0.1)', null);
+  const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+  grad.addColorStop(0, COLORS.neural);
+  grad.addColorStop(1, COLORS.symbolic);
+  drawRoundedRect(barX, barY, Math.max(10, barW * pct), 10, 5, grad, null);
+
+  ctx.font = `500 14px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.textMuted;
+  ctx.textAlign = 'right';
+  ctx.fillText('POETICS VR PLATFORM // AI CORE', barX - 24, 61);
+  ctx.restore();
+}
+
+function drawSubtitleBar(voText, sceneProgress) {
+  if (!voText) return;
+  ctx.save();
+  ctx.font = `500 23px ${FONTS.body}`;
+  const maxWidth = 1460;
+  const words = voText.split(' ');
+  const lines = [];
+  let currentLine = '';
+  for (const w of words) {
+    const test = currentLine ? currentLine + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth) {
+      lines.push(currentLine);
+      currentLine = w;
+    } else {
+      currentLine = test;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  const boxH = lines.length * 34 + 26;
+  const boxY = H - boxH - 24;
+  drawRoundedRect(W / 2 - 780, boxY, 1560, boxH, 14, 'rgba(12, 15, 24, 0.88)', 'rgba(255, 215, 0, 0.28)', 1.5);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  // Highlight words progressively based on sceneProgress
+  const totalChars = voText.length;
+  const activeChar = Math.floor(clamp((sceneProgress - 0.04) / 0.88) * totalChars);
+
+  let charCount = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const ly = boxY + 13 + i * 34;
+    ctx.fillStyle = '#F8FAFC';
+    ctx.fillText(line, W / 2, ly);
+    charCount += line.length + 1;
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 1 & 11: OPENING & CLOSING (Neural Network -> Symbolic Graph Morph)
+// ============================================================================
+function renderSceneOpeningOrClosing(p, globalTime, isClosing = false) {
+  const morph = isClosing ? easeInOutCubic(clamp(p * 1.4)) : easeInOutCubic(clamp((p - 0.12) * 1.45));
+  const cx = W * 0.5;
+  const cy = H * 0.44;
+  const rotY = globalTime * 0.45;
+
+  // Project 3D nodes
+  const projected = NODES_OPENING.map((n, idx) => {
+    const x3 = lerp(n.nx, n.sx, morph);
+    const y3 = lerp(n.ny, n.sy, morph);
+    const z3 = lerp(n.nz, n.sz, morph);
+    const cosY = Math.cos(rotY);
+    const sinY = Math.sin(rotY);
+    const rx = x3 * cosY - z3 * sinY;
+    const rz = x3 * sinY + z3 * cosY;
+    const fov = 700 / (700 + rz + 250);
+    return {
+      x: cx + rx * fov,
+      y: cy + y3 * fov,
+      z: rz,
+      scale: fov,
+      label: n.label,
+      isMajor: n.isMajor,
+      idx
+    };
+  });
+
+  // Draw edges
+  ctx.save();
+  for (let i = 0; i < projected.length; i++) {
+    for (let j = i + 1; j < projected.length; j++) {
+      const a = projected[i];
+      const b = projected[j];
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const dist = Math.hypot(dx, dy);
+      const maxDist = lerp(155, 190, morph);
+      if (dist < maxDist && (i + j) % 3 === 0) {
+        const alpha = (1 - dist / maxDist) * 0.45;
+        ctx.strokeStyle = morph < 0.5
+          ? `rgba(30, 144, 255, ${alpha})`
+          : `rgba(255, 215, 0, ${alpha})`;
+        ctx.lineWidth = morph > 0.5 && a.isMajor && b.isMajor ? 2.2 : 1.2;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        // Data packet traveling along edge
+        const pulse = (globalTime * 0.9 + (i * 0.13)) % 1;
+        const px = lerp(a.x, b.x, pulse);
+        const py = lerp(a.y, b.y, pulse);
+        ctx.fillStyle = pulse < 0.5 ? COLORS.neuralLight : COLORS.symbolic;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // Draw nodes
+  for (const pt of projected) {
+    const isGold = morph > 0.55 || (morph > 0.3 && pt.idx % 2 === 0);
+    const col = isGold ? COLORS.symbolic : COLORS.neural;
+    const radius = (pt.isMajor ? 8.5 : 4.8) * pt.scale;
+    drawGlowCircle(pt.x, pt.y, radius, col, pt.isMajor ? 18 : 8);
+
+    if (pt.isMajor && morph > 0.35) {
+      ctx.font = `600 ${Math.round(13 * pt.scale)}px ${FONTS.code}`;
+      ctx.fillStyle = `rgba(255, 240, 180, ${clamp((morph - 0.35) * 2)})`;
+      ctx.fillText(pt.label, pt.x + 12, pt.y + 4);
+    }
+  }
+  ctx.restore();
+
+  // Left & Right Paradigm Indicators
+  drawBadge(110, 150, '● NEURAL PERCEPTION (3DGS • SAM 2 • CLIP)', 'rgba(30, 144, 255, 0.18)', COLORS.neuralLight, COLORS.neural);
+  drawBadge(W - 560, 150, '◆ SYMBOLIC REASONING (RDF • PROLOG • Z3)', 'rgba(255, 215, 0, 0.18)', COLORS.symbolicLight, COLORS.symbolic);
+
+  // Center Hero Title Card
+  ctx.save();
+  const cardY = 670;
+  drawRoundedRect(W / 2 - 620, cardY, 1240, 230, 24, 'rgba(16, 20, 32, 0.86)', 'rgba(255, 255, 255, 0.18)', 2);
+
+  ctx.textAlign = 'center';
+  ctx.font = `800 58px ${FONTS.title}`;
+  const titleGrad = ctx.createLinearGradient(W / 2 - 450, 0, W / 2 + 450, 0);
+  titleGrad.addColorStop(0, '#60B5FF');
+  titleGrad.addColorStop(0.5, '#FFFFFF');
+  titleGrad.addColorStop(1, '#FFD700');
+  ctx.fillStyle = titleGrad;
+  ctx.fillText('NEUROSYMBOLIC XR FRAMEWORK', W / 2, cardY + 82);
+
+  ctx.font = `500 28px ${FONTS.body}`;
+  ctx.fillStyle = '#E2E8F0';
+  ctx.fillText(
+    isClosing
+      ? 'The Future of Intelligent Extended Reality • Built with ❤️ for the Poetics VR Platform'
+      : 'Bridging Continuous Neural Perception with Formal Symbolic Reasoning for VR',
+    W / 2,
+    cardY + 138
+  );
+
+  ctx.font = `600 18px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.success;
+  ctx.fillText('4 INTERCONNECTED AI SYSTEMS  •  <20ms XR LATENCY  •  BIDIRECTIONAL GROUNDING', W / 2, cardY + 188);
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 2: ARCHITECTURE OVERVIEW (5 Sequential Layers + Bidirectional Bridge)
+// ============================================================================
+function renderSceneArchitecture(p, globalTime) {
+  const layers = [
+    { name: '5. APPLICATION LAYER', sub: 'Poetics VR Platform • Venue Intelligence • Multi-User Sessions', color: '#00FF66', y: 145 },
+    { name: '4. SYMBOLIC REASONING LAYER', sub: 'RDF/OWL Scene Graphs • SWI-Prolog Logic Engine • Z3 SMT Constraint Solver', color: '#FFD700', y: 295 },
+    { name: '3. BIDIRECTIONAL GROUNDING BRIDGE', sub: 'Neural→Symbolic Entity/Relation Extraction  ⇄  Symbolic→Neural Top-Down Validation', color: '#38BDF8', y: 445 },
+    { name: '2. NEURAL PERCEPTION LAYER', sub: '3D Gaussian Splatting (gsplat) • Meta SAM 2 Segmentation • OpenAI CLIP (ViT-L/14)', color: '#1E90FF', y: 595 },
+    { name: '1. XR SENSOR STREAM LAYER', sub: 'Multi-View RGB-D Cameras • 6-DOF Visual-Inertial IMU • 21-Joint Hand & Eye Gaze Tracking', color: '#818CF8', y: 745 }
+  ];
+
+  // Left side: 5-layer animated stack (appear bottom-up 1 -> 5)
+  const stackX = 80;
+  const stackW = 1040;
+  const boxH = 112;
+
+  for (let i = 0; i < layers.length; i++) {
+    // Bottom-up appearance order: index 4 appears first, index 0 appears last
+    const appearOrder = 4 - i;
+    const localP = easeOutCubic(clamp((p - appearOrder * 0.11) * 3.2));
+    if (localP <= 0.01) continue;
+
+    const L = layers[i];
+    ctx.save();
+    ctx.globalAlpha = localP;
+    const slideX = stackX - (1 - localP) * 40;
+    drawRoundedRect(slideX, L.y, stackW, boxH, 16, 'rgba(22, 27, 42, 0.92)', L.color, 2.2);
+
+    // Left accent bar
+    drawRoundedRect(slideX, L.y, 12, boxH, 6, L.color, null);
+
+    ctx.font = `800 24px ${FONTS.title}`;
+    ctx.fillStyle = L.color;
+    ctx.fillText(L.name, slideX + 34, L.y + 44);
+
+    ctx.font = `500 19px ${FONTS.body}`;
+    ctx.fillStyle = '#F1F5F9';
+    ctx.fillText(L.sub, slideX + 34, L.y + 82);
+    ctx.restore();
+
+    // Animated bidirectional connectors between layers
+    if (i < layers.length - 1) {
+      const nextY = layers[i + 1].y;
+      const midY1 = L.y + boxH;
+      const midY2 = nextY;
+      // Upward blue particles (bottom-up perception) & downward gold particles (top-down validation)
+      for (let k = 0; k < 4; k++) {
+        const upX = stackX + 260 + k * 140;
+        const downX = stackX + 320 + k * 140;
+        const tUp = (globalTime * 1.8 + k * 0.25) % 1;
+        const tDown = (globalTime * 1.8 + k * 0.25) % 1;
+        drawGlowCircle(upX, lerp(midY2, midY1, tUp), 4.5, COLORS.neural, 10);
+        drawGlowCircle(downX, lerp(midY1, midY2, tDown), 4.5, COLORS.symbolic, 10);
+      }
+    }
+  }
+
+  // Right side: Live Grounding Bridge Code & Telemetry Panel
+  const rightX = 1165;
+  const rightW = 685;
+  drawRoundedRect(rightX, 145, rightW, 712, 18, 'rgba(16, 20, 30, 0.95)', 'rgba(56, 189, 248, 0.4)', 2);
+  drawBadge(rightX + 28, 172, 'src/core/bridge.py — Bidirectional Grounding', 'rgba(30, 144, 255, 0.2)', COLORS.neuralLight, COLORS.neural);
+
+  const codeLines = [
+    { c: '#94A3B8', t: '# Bottom-Up: Neural Tensor -> Symbolic RDF Graph' },
+    { c: '#60B5FF', t: 'def ground_neural_to_symbolic(self, splats, masks):' },
+    { c: '#F8FAFC', t: '    entities = self.clip.classify_regions(splats, masks)' },
+    { c: '#F8FAFC', t: '    for e1, e2 in itertools.permutations(entities, 2):' },
+    { c: '#FFD700', t: '        rel = self.infer_spatial_predicate(e1.bbox, e2.bbox)' },
+    { c: '#00FF66', t: '        if rel.confidence >= 0.85:' },
+    { c: '#00FF66', t: '            self.rdf_graph.add((e1.uri, rel.pred, e2.uri))' },
+    { c: '#94A3B8', t: '' },
+    { c: '#94A3B8', t: '# Top-Down: Symbolic Constraints -> Neural Prior' },
+    { c: '#FFD700', t: 'def validate_symbolic_constraints(self, proposal):' },
+    { c: '#F8FAFC', t: '    prolog_ok = self.prolog.query(proposal.action)' },
+    { c: '#F8FAFC', t: '    z3_sat = self.z3_solver.check(proposal.geometry)' },
+    { c: '#00FF66', t: '    return GroundingResult(valid=(prolog_ok and z3_sat))' }
+  ];
+
+  ctx.save();
+  ctx.font = `500 18px ${FONTS.code}`;
+  for (let i = 0; i < codeLines.length; i++) {
+    ctx.fillStyle = codeLines[i].c;
+    ctx.fillText(codeLines[i].t, rightX + 30, 248 + i * 32);
+  }
+
+  // Bottom right live diagram of the 4 systems fed by the bridge
+  drawRoundedRect(rightX + 28, 675, rightW - 56, 155, 14, 'rgba(255, 215, 0, 0.07)', 'rgba(255, 215, 0, 0.35)', 1.5);
+  ctx.font = `700 17px ${FONTS.title}`;
+  ctx.fillStyle = COLORS.symbolic;
+  ctx.fillText('UNIFIED REASONING BRIDGE POWERS 4 REAL-TIME SYSTEMS:', rightX + 50, 710);
+
+  const sysBadges = ['1. Spatial Reasoning', '2. Hybrid SLAM', '3. Training Assistant', '4. Asset Generator'];
+  for (let i = 0; i < 4; i++) {
+    const bx = rightX + 48 + (i % 2) * 305;
+    const by = 730 + Math.floor(i / 2) * 44;
+    drawBadge(bx, by, sysBadges[i], 'rgba(30, 144, 255, 0.22)', '#fff', COLORS.neural);
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 3: SYSTEM 1 — SPATIAL REASONING (3DGS + SAM 2 + CLIP + RDF Scene Graph)
+// ============================================================================
+function renderSceneSpatialReasoning(p, globalTime) {
+  // Left Panel: 3D Gaussian Splatting + SAM 2 Masks + CLIP Labels
+  const lx = 70, ly = 115, lw = 880, lh = 560;
+  drawRoundedRect(lx, ly, lw, lh, 18, 'rgba(16, 20, 32, 0.92)', COLORS.neural, 2);
+  drawBadge(lx + 24, ly + 20, 'NEURAL PERCEPTION: 3D Gaussian Splatting + SAM 2 + CLIP', 'rgba(30, 144, 255, 0.22)', COLORS.neuralLight, COLORS.neural);
+
+  // Optimization progress
+  const optProgress = clamp(p * 2.2);
+  const iterCount = Math.floor(optProgress * 10000);
+  ctx.save();
+  ctx.font = `600 16px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.success;
+  ctx.fillText(`3DGS Optimization: ${iterCount.toLocaleString()} / 10,000 iters  |  Gaussians: 100,000`, lx + 26, ly + 78);
+
+  // Render 3D Gaussian splats converging into scene objects
+  const cx = lx + lw * 0.5;
+  const cy = ly + lh * 0.56;
+  const rot = globalTime * 0.35;
+  const converge = easeOutCubic(clamp(p * 2.0));
+
+  for (const sp of SPLATS_3D) {
+    const x3 = lerp(sp.sx, sp.x, converge);
+    const y3 = lerp(sp.sy, sp.y, converge);
+    const z3 = lerp(sp.sz, sp.z, converge);
+    const rx = x3 * Math.cos(rot) - z3 * Math.sin(rot);
+    const rz = x3 * Math.sin(rot) + z3 * Math.cos(rot);
+    const scale = 550 / (550 + rz + 220);
+    const px = cx + rx * scale;
+    const py = cy + y3 * scale;
+
+    ctx.fillStyle = sp.color;
+    ctx.globalAlpha = 0.68;
+    ctx.beginPath();
+    ctx.ellipse(px, py, sp.r * scale * 1.4, sp.r * scale * 0.9, rot * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // SAM 2 Bounding Masks & CLIP Open-Vocabulary Labels
+  if (p > 0.22) {
+    const boxes = [
+      { label: 'table (CLIP: 0.99)', x: lx + 250, y: ly + 290, w: 380, h: 165, c: '#1E90FF' },
+      { label: 'laptop (CLIP: 0.98)', x: lx + 355, y: ly + 215, w: 145, h: 95, c: '#00FF66' },
+      { label: 'chair (CLIP: 0.96)', x: lx + 130, y: ly + 255, w: 135, h: 175, c: '#38BDF8' },
+      { label: 'book (CLIP: 0.95)', x: lx + 520, y: ly + 260, w: 95, h: 65, c: '#FFD700' },
+      { label: 'cup (CLIP: 0.94)', x: lx + 495, y: ly + 195, w: 70, h: 60, c: '#F472B6' }
+    ];
+    for (const b of boxes) {
+      drawRoundedRect(b.x, b.y, b.w, b.h, 10, 'rgba(255,255,255,0.04)', b.c, 2);
+      drawRoundedRect(b.x, b.y - 26, ctx.measureText(b.label).width + 24, 26, 6, b.c, null);
+      ctx.font = `700 14px ${FONTS.code}`;
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText(b.label, b.x + 8, b.y - 8);
+    }
+  }
+  ctx.restore();
+
+  // Right Panel: Symbolic RDF Scene Graph
+  const rx = 980, ry = 115, rw = 870, rh = 560;
+  drawRoundedRect(rx, ry, rw, rh, 18, 'rgba(16, 20, 32, 0.92)', COLORS.symbolic, 2);
+  drawBadge(rx + 24, ry + 20, 'SYMBOLIC LAYER: RDF Spatial Scene Graph & Ontology', 'rgba(255, 215, 0, 0.18)', COLORS.symbolicLight, COLORS.symbolic);
+
+  const gNodes = [
+    { id: 'table', label: 'entity_1: table\n[2.5, 0.8, -1.0]', x: rx + 430, y: ry + 310, c: COLORS.neural },
+    { id: 'laptop', label: 'entity_2: laptop\n[2.5, 1.0, -1.0]', x: rx + 220, y: ry + 165, c: COLORS.success },
+    { id: 'chair', label: 'entity_0: chair\n[2.3, 0.5, -1.2]', x: rx + 195, y: ry + 450, c: '#38BDF8' },
+    { id: 'book', label: 'entity_3: book\n[2.7, 1.0, -0.9]', x: rx + 660, y: ry + 175, c: COLORS.symbolic },
+    { id: 'cup', label: 'entity_4: cup\n[2.6, 1.0, -1.1]', x: rx + 675, y: ry + 435, c: '#F472B6' }
+  ];
+  const gEdges = [
+    { from: 1, to: 0, pred: 'spatial:ON (0.95)' },
+    { from: 2, to: 0, pred: 'spatial:NEAR (0.87)' },
+    { from: 1, to: 2, pred: 'spatial:ABOVE (0.92)' },
+    { from: 3, to: 0, pred: 'spatial:ON (0.96)' },
+    { from: 4, to: 0, pred: 'spatial:ON (0.94)' }
+  ];
+
+  ctx.save();
+  for (const e of gEdges) {
+    const a = gNodes[e.from];
+    const b = gNodes[e.to];
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.65)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    drawRoundedRect(mx - 78, my - 15, 156, 30, 8, '#1e2436', COLORS.symbolic, 1.2);
+    ctx.font = `700 13px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.symbolicLight;
+    ctx.textAlign = 'center';
+    ctx.fillText(e.pred, mx, my + 5);
+  }
+
+  for (const n of gNodes) {
+    const highlight = p > 0.55 && (n.id === 'laptop' || n.id === 'book' || n.id === 'cup');
+    drawRoundedRect(n.x - 95, n.y - 36, 190, 72, 14, '#151926', highlight ? COLORS.success : n.c, highlight ? 3.5 : 2);
+    ctx.font = `700 16px ${FONTS.code}`;
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    const parts = n.label.split('\n');
+    ctx.fillText(parts[0], n.x, n.y - 6);
+    ctx.font = `500 13px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillText(parts[1], n.x, n.y + 18);
+  }
+  ctx.restore();
+
+  // Bottom Terminal Query Panel
+  drawRoundedRect(70, 695, 1780, 225, 16, 'rgba(12, 15, 24, 0.95)', 'rgba(0, 255, 102, 0.45)', 2);
+  ctx.save();
+  ctx.font = `600 19px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.neuralLight;
+  ctx.fillText('$ python demo.py --system spatial_reasoning', 102, 738);
+  ctx.fillStyle = '#F8FAFC';
+  ctx.fillText('>>> engine.query("Find all objects on the table")', 102, 776);
+  ctx.fillStyle = COLORS.symbolic;
+  ctx.fillText('SPARQL: SELECT ?entity WHERE { ?entity spatial:ON :entity_1_table . FILTER(?conf >= 0.85) }', 102, 814);
+  ctx.fillStyle = COLORS.success;
+  ctx.fillText('✓ QUERY RESULTS (3 matches in 2.4ms): [ "laptop" (0.95), "book" (0.96), "cup" (0.94) ]  |  Constraint Verified: True', 102, 856);
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 4: SYSTEM 2 — HYBRID SLAM WITH SEMANTIC MEMORY
+// ============================================================================
+function renderSceneHybridSlam(p, globalTime) {
+  // Left Panel: First-Person VR HUD + ORB-SLAM3 60FPS Wireframe & Trajectory
+  const lx = 70, ly = 115, lw = 900, lh = 795;
+  drawRoundedRect(lx, ly, lw, lh, 18, 'rgba(14, 20, 32, 0.94)', COLORS.neural, 2);
+  drawBadge(lx + 24, ly + 22, 'ORB-SLAM3 VISUAL-INERTIAL ODOMETRY (60 FPS)', 'rgba(30, 144, 255, 0.22)', COLORS.neuralLight, COLORS.neural);
+
+  // Simulated 3D VR Corridor wireframe + green tracked feature points
+  ctx.save();
+  const vcx = lx + lw * 0.5 + Math.sin(globalTime * 1.1) * 28;
+  const vcy = ly + lh * 0.48 + Math.cos(globalTime * 1.7) * 14;
+
+  // Perspective corridor lines
+  ctx.strokeStyle = 'rgba(30, 144, 255, 0.28)';
+  ctx.lineWidth = 1.5;
+  for (let i = 1; i <= 6; i++) {
+    const rw = i * 125;
+    const rh = i * 85;
+    ctx.strokeRect(vcx - rw / 2, vcy - rh / 2, rw, rh);
+  }
+
+  // Green ORB feature keypoints
+  for (let i = 0; i < 95; i++) {
+    const fx = lx + 80 + ((seededRandom(i * 5) * 740 + globalTime * 45) % 740);
+    const fy = ly + 110 + seededRandom(i * 5 + 1) * 520;
+    ctx.strokeStyle = COLORS.success;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(fx - 4, fy - 4, 8, 8);
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(fx - 12, fy + 4);
+    ctx.stroke();
+  }
+
+  // 6-DOF Trajectory Curve overlay
+  ctx.strokeStyle = COLORS.symbolic;
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  for (let t = 0; t <= 40; t++) {
+    const tx = lx + 140 + t * 16;
+    const ty = ly + 620 - Math.sin(t * 0.22 + globalTime) * 55 - t * 3.5;
+    if (t === 0) ctx.moveTo(tx, ty);
+    else ctx.lineTo(tx, ty);
+  }
+  ctx.stroke();
+
+  // HUD Telemetry Overlay
+  drawRoundedRect(lx + 30, ly + 660, lw - 60, 110, 12, 'rgba(10, 14, 22, 0.88)', 'rgba(0, 255, 102, 0.4)', 1.5);
+  ctx.font = `700 20px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.success;
+  const px = (2.4 + Math.sin(globalTime) * 1.2).toFixed(2);
+  const pz = (-1.1 + Math.cos(globalTime * 0.8) * 0.9).toFixed(2);
+  ctx.fillText(`POSE 6-DOF: [${px}m, 1.65m, ${pz}m]   |   LATENCY: 16.0 ms (60 FPS) ✓`, lx + 55, ly + 704);
+  ctx.fillStyle = '#E2E8F0';
+  ctx.font = `500 17px ${FONTS.code}`;
+  ctx.fillText(`MAP POINTS: 1,247 active   |   TRAJECTORY: 12.5m   |   LOOP CLOSURE: VERIFIED`, lx + 55, ly + 744);
+  ctx.restore();
+
+  // Right Panel: Persistent Semantic Memory & Cross-Session Relocalization
+  const rx = 1000, ry = 115, rw = 850, rh = 795;
+  drawRoundedRect(rx, ry, rw, rh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.symbolic, 2);
+  drawBadge(rx + 24, ry + 22, 'SYMBOLIC SEMANTIC MEMORY & TOPOLOGICAL GRAPH', 'rgba(255, 215, 0, 0.2)', COLORS.symbolicLight, COLORS.symbolic);
+
+  const landmarks = [
+    { name: 'Landmark #01: Venue Entrance Door', pos: '[5.2, 1.0, 0.0]', seen: 'First seen: 2.5s ago', obs: 'Observations: 15', status: 'PERSISTED' },
+    { name: 'Landmark #02: Main Theater Stage', pos: '[0.0, 1.5, -8.4]', seen: 'First seen: 10.2s ago', obs: 'Observations: 42', status: 'PERSISTED' },
+    { name: 'Landmark #03: Sound Control Booth', pos: '[-4.1, 1.2, -3.0]', seen: 'First seen: 14.8s ago', obs: 'Observations: 28', status: 'PERSISTED' },
+    { name: 'Landmark #04: Modular Lighting Rig', pos: '[0.0, 4.8, -6.0]', seen: 'First seen: 18.1s ago', obs: 'Observations: 34', status: 'PERSISTED' }
+  ];
+
+  ctx.save();
+  for (let i = 0; i < landmarks.length; i++) {
+    const lm = landmarks[i];
+    const cardY = ry + 85 + i * 122;
+    drawRoundedRect(rx + 30, cardY, rw - 60, 104, 14, 'rgba(28, 34, 52, 0.9)', 'rgba(255, 215, 0, 0.35)', 1.5);
+    ctx.font = `700 20px ${FONTS.title}`;
+    ctx.fillStyle = COLORS.symbolicLight;
+    ctx.fillText(lm.name, rx + 54, cardY + 38);
+
+    ctx.font = `500 16px ${FONTS.code}`;
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText(`Pos: ${lm.pos}   •   ${lm.seen}   •   ${lm.obs}`, rx + 54, cardY + 76);
+
+    drawBadge(rx + rw - 205, cardY + 22, `✓ ${lm.status}`, 'rgba(0, 255, 102, 0.18)', COLORS.success, COLORS.success);
+  }
+
+  // Session Persistence & Relocalization Card
+  const relocY = ry + 585;
+  const isReloc = p > 0.55;
+  drawRoundedRect(rx + 30, relocY, rw - 60, 180, 16, isReloc ? 'rgba(0, 255, 102, 0.1)' : 'rgba(30, 144, 255, 0.1)', isReloc ? COLORS.success : COLORS.neural, 2);
+  ctx.font = `800 22px ${FONTS.title}`;
+  ctx.fillStyle = isReloc ? COLORS.success : COLORS.neuralLight;
+  ctx.fillText(
+    isReloc ? '✓ CROSS-SESSION MAP RELOCALIZATION COMPLETE' : '⟳ SAVING PERSISTENT SEMANTIC MAP TO GRAPH STORE...',
+    rx + 56,
+    relocY + 48
+  );
+  ctx.font = `500 18px ${FONTS.body}`;
+  ctx.fillStyle = '#F1F5F9';
+  ctx.fillText('• Previous session RDF semantic landmarks reloaded in 14.2ms', rx + 56, relocY + 92);
+  ctx.fillText('• Loop closure verified via topological object graph matching', rx + 56, relocY + 126);
+  ctx.fillText('• Zero cold-start drift across multi-day VR venue sessions', rx + 56, relocY + 160);
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 5: SYSTEM 3 — VR TRAINING ASSISTANT (Hand Tracking + Prolog Validation)
+// ============================================================================
+function renderSceneTrainingAssistant(p, globalTime) {
+  // Left Panel: VR Hand Skeleton Tracking + Procedure UI
+  const lx = 70, ly = 115, lw = 890, lh = 795;
+  drawRoundedRect(lx, ly, lw, lh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.neural, 2);
+  drawBadge(lx + 24, ly + 22, 'VR PROCEDURE MONITOR: 21-JOINT HAND & GAZE TRACKING', 'rgba(30, 144, 255, 0.22)', COLORS.neuralLight, COLORS.neural);
+
+  ctx.save();
+  // Step Header Box
+  const stepDone = p > 0.52;
+  drawRoundedRect(lx + 30, ly + 78, lw - 60, 105, 14, 'rgba(26, 32, 48, 0.95)', stepDone ? COLORS.success : COLORS.symbolic, 2);
+  ctx.font = `800 22px ${FONTS.title}`;
+  ctx.fillStyle = stepDone ? COLORS.success : COLORS.symbolic;
+  ctx.fillText(
+    stepDone ? 'PROCEDURE: BASIC ASSEMBLY TASK  —  STEP 2 / 4 ACTIVE' : 'PROCEDURE: BASIC ASSEMBLY TASK  —  STEP 1 / 4 ACTIVE',
+    lx + 54,
+    ly + 118
+  );
+  ctx.font = `600 19px ${FONTS.body}`;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(
+    stepDone ? 'Current Instruction: Align base component with mounting holes (Tol: 2mm)' : 'Current Instruction: Pick up the base component from workbench',
+    lx + 54,
+    ly + 156
+  );
+
+  // Target 3D Component + Articulated 21-Joint Hand Skeleton
+  const objX = lx + 560, objY = ly + 430;
+  drawRoundedRect(objX - 95, objY - 65, 190, 130, 16, 'rgba(30, 144, 255, 0.2)', stepDone ? COLORS.success : COLORS.neuralLight, 3);
+  ctx.font = `700 17px ${FONTS.code}`;
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.fillText('base_component', objX, objY + 5);
+
+  // Hand approaching component
+  const approach = easeInOutCubic(clamp(p * 1.8));
+  const wristX = lerp(lx + 230, objX - 110, approach);
+  const wristY = lerp(ly + 560, objY + 60, approach);
+
+  const fingers = [
+    [[-35, -30], [-55, -65], [-65, -95]],
+    [[-15, -45], [-20, -90], [-22, -125]],
+    [[5, -48], [10, -95], [12, -130]],
+    [[25, -42], [35, -85], [40, -115]],
+    [[42, -28], [58, -60], [66, -85]]
+  ];
+
+  ctx.strokeStyle = COLORS.neuralLight;
+  ctx.lineWidth = 3.5;
+  for (const f of fingers) {
+    let px = wristX, py = wristY;
+    for (const [dx, dy] of f) {
+      const pinch = approach * 0.28;
+      const nx = wristX + dx * (1 - pinch);
+      const ny = wristY + dy * (1 - pinch);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(nx, ny);
+      ctx.stroke();
+      drawGlowCircle(nx, ny, 5.5, COLORS.symbolic, 10);
+      px = nx;
+      py = ny;
+    }
+  }
+  drawGlowCircle(wristX, wristY, 9, COLORS.neural, 14);
+
+  // Distance & Gesture Telemetry Pills
+  ctx.textAlign = 'left';
+  const distM = lerp(0.34, 0.08, approach).toFixed(2);
+  drawBadge(lx + 40, ly + 685, `HAND DISTANCE: ${distM}m`, 'rgba(30, 144, 255, 0.22)', '#fff', COLORS.neural);
+  drawBadge(lx + 310, ly + 685, `GESTURE: ${approach > 0.45 ? 'GRAB (0.98)' : 'APPROACH'}`, 'rgba(255, 215, 0, 0.22)', COLORS.symbolicLight, COLORS.symbolic);
+  drawBadge(lx + 610, ly + 685, `GAZE: LOCKED ✓`, 'rgba(0, 255, 102, 0.22)', COLORS.success, COLORS.success);
+  ctx.restore();
+
+  // Right Panel: Prolog Procedural Reasoning & Constraint Checkmarks
+  const rx = 990, ry = 115, rw = 860, rh = 795;
+  drawRoundedRect(rx, ry, rw, rh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.symbolic, 2);
+  drawBadge(rx + 24, ry + 22, 'SYMBOLIC ENGINE: SWI-PROLOG PROCEDURAL VALIDATOR', 'rgba(255, 215, 0, 0.2)', COLORS.symbolicLight, COLORS.symbolic);
+
+  const prologLines = [
+    '% Procedural Preconditions & Safety Rules (Prolog)',
+    'can_grab(Hand, Object) :-',
+    '    hand_state(Hand, empty),',
+    '    gaze_target(Object, Confidence), Confidence >= 0.85,',
+    '    euclidean_distance(Hand, Object, D), D =< 0.10,',
+    '    step_preconditions_met(step_1, Object).',
+    '',
+    '?- can_grab(right_hand, base_component).',
+    '   D = 0.08, Confidence = 0.98',
+    '   true.   % Verified in 2.8 ms'
+  ];
+
+  ctx.save();
+  drawRoundedRect(rx + 30, ry + 80, rw - 60, 345, 14, '#0c0f18', 'rgba(255,255,255,0.12)', 1.5);
+  ctx.font = `500 18px ${FONTS.code}`;
+  for (let i = 0; i < prologLines.length; i++) {
+    ctx.fillStyle = i === 0 ? '#64748B' : (i >= 7 ? COLORS.success : '#F8FAFC');
+    ctx.fillText(prologLines[i], rx + 54, ry + 122 + i * 30);
+  }
+
+  // Validation Checklist
+  const checks = [
+    '✓ Preconditions satisfied: hand_state(right_hand, empty)',
+    '✓ Spatial reach constraint valid: distance 0.08m <= 0.10m',
+    '✓ Action gesture verified: GRAB on base_component',
+    '✓ Step 1/4 Completed! Advancing procedure graph → Step 2/4'
+  ];
+  for (let i = 0; i < checks.length; i++) {
+    const cy = ry + 455 + i * 76;
+    const active = p > 0.2 + i * 0.12;
+    drawRoundedRect(rx + 30, cy, rw - 60, 62, 12, active ? 'rgba(0, 255, 102, 0.12)' : 'rgba(255,255,255,0.04)', active ? COLORS.success : 'rgba(255,255,255,0.1)', 1.5);
+    ctx.font = `700 19px ${FONTS.body}`;
+    ctx.fillStyle = active ? COLORS.success : COLORS.textMuted;
+    ctx.fillText(checks[i], rx + 54, cy + 38);
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 6: SYSTEM 4 — NEURAL-SYMBOLIC ASSET GENERATOR (Z3 + 3D Diffusion)
+// ============================================================================
+function renderSceneAssetGenerator(p, globalTime) {
+  // Left Column: Specification + Z3 Constraint Solver
+  const lx = 70, ly = 115, lw = 860;
+  drawRoundedRect(lx, ly, lw, 380, 18, 'rgba(16, 20, 32, 0.94)', COLORS.symbolic, 2);
+  drawBadge(lx + 24, ly + 22, '1. ASSET SPECIFICATION & GEOMETRIC CONSTRAINTS', 'rgba(255, 215, 0, 0.2)', COLORS.symbolicLight, COLORS.symbolic);
+
+  ctx.save();
+  const specs = [
+    ['Asset Type:', '3D Mesh / Gaussian Splat (AssetType.OBJECT_3D)'],
+    ['Natural Prompt:', '"modern ergonomic office chair with wheels"'],
+    ['Bounding Box:', '0.60m (W) × 1.00m (H) × 0.60m (D) ± 0.02m'],
+    ['Symmetry Axis:', 'Reflectional Symmetry on Y-Z Plane'],
+    ['Functional Rules:', 'Sittable (seat_h: 0.48m), Movable, Center-of-Mass Stable']
+  ];
+  for (let i = 0; i < specs.length; i++) {
+    ctx.font = `700 18px ${FONTS.body}`;
+    ctx.fillStyle = COLORS.symbolic;
+    ctx.fillText(specs[i][0], lx + 34, ly + 95 + i * 54);
+    ctx.font = `500 18px ${FONTS.code}`;
+    ctx.fillStyle = '#F8FAFC';
+    ctx.fillText(specs[i][1], lx + 225, ly + 95 + i * 54);
+  }
+
+  // Bottom Left: Z3 SMT Solver Output
+  const zy = 515;
+  drawRoundedRect(lx, zy, lw, 395, 18, 'rgba(12, 16, 26, 0.96)', COLORS.success, 2);
+  drawBadge(lx + 24, zy + 22, '2. MICROSOFT Z3 SMT CONSTRAINT SOLVER', 'rgba(0, 255, 102, 0.18)', COLORS.success, COLORS.success);
+
+  const z3Lines = [
+    'solver = z3.Solver()',
+    'solver.add(width == 0.60, height == 1.00, depth == 0.60)',
+    'solver.add(seat_height >= 0.42, seat_height <= 0.52)',
+    'solver.add(com_x**2 + com_z**2 <= base_radius**2)  # Stability',
+    '------------------------------------------------------------',
+    '✓ Checking geometric & physics constraints... [SATISFIABLE]',
+    '✓ Dimensions satisfiable   ✓ Bilateral symmetry achievable',
+    '✓ Static stability margin: 98.4% (Verified prior to diffusion)'
+  ];
+  ctx.font = `500 17px ${FONTS.code}`;
+  for (let i = 0; i < z3Lines.length; i++) {
+    ctx.fillStyle = i >= 5 ? COLORS.success : '#CBD5E1';
+    ctx.fillText(z3Lines[i], lx + 34, zy + 92 + i * 36);
+  }
+  ctx.restore();
+
+  // Right Column: 3D Diffusion Synthesis & 4 Constraint-Verified Variations
+  const rx = 960, ry = 115, rw = 890, rh = 795;
+  drawRoundedRect(rx, ry, rw, rh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.neural, 2);
+  drawBadge(rx + 24, ry + 22, '3. GUIDED 3D DIFFUSION & VARIATION GALLERY', 'rgba(30, 144, 255, 0.22)', COLORS.neuralLight, COLORS.neural);
+
+  // Rotating 3D Wireframe Chair Preview
+  ctx.save();
+  const cx = rx + rw * 0.5;
+  const cy = ry + 265;
+  const rot = globalTime * 0.9;
+
+  // Draw stylized rotating 3D office chair geometry
+  function proj3D(x, y, z) {
+    const rx3 = x * Math.cos(rot) - z * Math.sin(rot);
+    const rz3 = x * Math.sin(rot) + z * Math.cos(rot);
+    const s = 420 / (420 + rz3);
+    return [cx + rx3 * s, cy + y * s];
+  }
+
+  ctx.strokeStyle = COLORS.neuralLight;
+  ctx.lineWidth = 3;
+  // Seat square
+  const seat = [[-65, 15, -65], [65, 15, -65], [65, 15, 65], [-65, 15, 65]];
+  ctx.beginPath();
+  seat.forEach((pt, idx) => {
+    const [px, py] = proj3D(...pt);
+    if (idx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.closePath();
+  ctx.stroke();
+
+  // Backrest
+  const back = [[-60, 15, -65], [60, 15, -65], [55, -110, -75], [-55, -110, -75]];
+  ctx.strokeStyle = COLORS.symbolic;
+  ctx.beginPath();
+  back.forEach((pt, idx) => {
+    const [px, py] = proj3D(...pt);
+    if (idx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  });
+  ctx.closePath();
+  ctx.stroke();
+
+  // Central stem + 5 wheel legs
+  const [sx0, sy0] = proj3D(0, 15, 0);
+  const [sx1, sy1] = proj3D(0, 95, 0);
+  ctx.strokeStyle = COLORS.success;
+  ctx.beginPath(); ctx.moveTo(sx0, sy0); ctx.lineTo(sx1, sy1); ctx.stroke();
+  for (let w = 0; w < 5; w++) {
+    const ang = (w / 5) * Math.PI * 2;
+    const [wx, wy] = proj3D(Math.cos(ang) * 75, 105, Math.sin(ang) * 75);
+    ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(wx, wy); ctx.stroke();
+    drawGlowCircle(wx, wy, 5, COLORS.symbolic, 8);
+  }
+
+  // 4 Variations Grid at bottom of Right Panel
+  const vars = [
+    { title: 'Variation A: Minimalist Mesh', score: 'Z3 Score: 0.99 ✓', col: COLORS.neural },
+    { title: 'Variation B: Executive Leather', score: 'Z3 Score: 0.97 ✓', col: COLORS.symbolic },
+    { title: 'Variation C: Cyber Studio', score: 'Z3 Score: 0.98 ✓', col: COLORS.success },
+    { title: 'Variation D: Matte Architectural', score: 'Z3 Score: 0.96 ✓', col: '#38BDF8' }
+  ];
+  for (let i = 0; i < 4; i++) {
+    const vx = rx + 34 + (i % 2) * 418;
+    const vy = ry + 455 + Math.floor(i / 2) * 155;
+    drawRoundedRect(vx, vy, 398, 138, 14, 'rgba(24, 30, 46, 0.92)', vars[i].col, 2);
+    ctx.font = `700 18px ${FONTS.title}`;
+    ctx.fillStyle = '#fff';
+    ctx.fillText(vars[i].title, vx + 22, vy + 42);
+    ctx.font = `600 15px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.success;
+    ctx.fillText(vars[i].score, vx + 22, vy + 78);
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillText('0.6m × 1.0m × 0.6m • Y-Symmetry', vx + 22, vy + 110);
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 7: POETICS PLATFORM INTEGRATION & SUPABASE REAL-TIME DASHBOARD
+// ============================================================================
+function renderScenePoeticsIntegration(p, globalTime) {
+  // Left Panel: Unified Python API + Active VR Venue View
+  const lx = 70, ly = 115, lw = 860, lh = 795;
+  drawRoundedRect(lx, ly, lw, lh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.neural, 2);
+  drawBadge(lx + 24, ly + 22, 'POETICS VR PLATFORM — UNIFIED PYTHON API', 'rgba(30, 144, 255, 0.22)', COLORS.neuralLight, COLORS.neural);
+
+  const apiCode = [
+    'from src.integration.poetics import create_poetics_integration',
+    '',
+    'integration = create_poetics_integration(config)',
+    'session = await integration.start_session(',
+    '    venue_id="main_theater",',
+    '    user_id="director_01",',
+    '    mode="exploration"',
+    ')',
+    '# Real-time event hooks across all 4 neurosymbolic systems',
+    'integration.on("scene_updated", sync_supabase_graph)',
+    'integration.on("pose_updated", broadcast_xr_telemetry)',
+    'integration.on("training_feedback", push_hud_validation)',
+    'integration.on("asset_generated", spawn_gltf_in_venue)'
+  ];
+  ctx.save();
+  drawRoundedRect(lx + 28, ly + 78, lw - 56, 415, 14, '#0c0f18', 'rgba(255,255,255,0.12)', 1.5);
+  ctx.font = `500 17px ${FONTS.code}`;
+  for (let i = 0; i < apiCode.length; i++) {
+    ctx.fillStyle = apiCode[i].startsWith('#') ? '#64748B' : (apiCode[i].includes('integration.') ? COLORS.symbolicLight : '#F8FAFC');
+    ctx.fillText(apiCode[i], lx + 50, ly + 116 + i * 28);
+  }
+
+  // Active Venue Status Card
+  drawRoundedRect(lx + 28, ly + 520, lw - 56, 245, 14, 'rgba(30, 144, 255, 0.09)', COLORS.neural, 1.5);
+  ctx.font = `800 22px ${FONTS.title}`;
+  ctx.fillStyle = '#fff';
+  ctx.fillText('LIVE VENUE: MAIN_THEATER  (SESSION #A94F-POETICS)', lx + 52, ly + 568);
+  ctx.font = `500 18px ${FONTS.body}`;
+  ctx.fillStyle = '#CBD5E1';
+  ctx.fillText('• Active XR Headsets Connected: 4 concurrent users (60 FPS sync)', lx + 52, ly + 612);
+  ctx.fillText('• Spatial Scene Graph: 12 grounded entities, 28 RDF predicates', lx + 52, ly + 650);
+  ctx.fillText('• Persistent SLAM Landmarks synced to Supabase pgvector', lx + 52, ly + 688);
+  ctx.fillStyle = COLORS.success;
+  ctx.fillText('● STATUS: STREAMING REAL-TIME TELEMETRY (16ms RTT)', lx + 52, ly + 730);
+  ctx.restore();
+
+  // Right Panel: Supabase Database Tables & Real-Time Event Log
+  const rx = 960, ry = 115, rw = 890, rh = 795;
+  drawRoundedRect(rx, ry, rw, rh, 18, 'rgba(16, 20, 32, 0.94)', COLORS.success, 2);
+  drawBadge(rx + 24, ry + 22, 'SUPABASE REAL-TIME BACKEND (POSTGRESQL + PGVECTOR)', 'rgba(0, 255, 102, 0.18)', COLORS.success, COLORS.success);
+
+  const tables = [
+    { name: 'public.venues', rows: '14 venues', desc: '3DGS checkpoints, coordinate frames & bounds' },
+    { name: 'public.venue_states', rows: '1,420 snapshots', desc: 'Serialized RDF scene graphs & CLIP embeddings' },
+    { name: 'public.sessions', rows: '318 sessions', desc: '6-DOF user trajectories & training analytics' },
+    { name: 'public.generated_assets', rows: '86 3D assets', desc: 'Z3-verified meshes & PBR textures' }
+  ];
+  ctx.save();
+  for (let i = 0; i < tables.length; i++) {
+    const ty = ry + 82 + i * 102;
+    drawRoundedRect(rx + 28, ty, rw - 56, 86, 12, 'rgba(24, 32, 46, 0.9)', 'rgba(0, 255, 102, 0.35)', 1.5);
+    ctx.font = `700 19px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.success;
+    ctx.fillText(tables[i].name, rx + 50, ty + 35);
+    ctx.fillStyle = COLORS.symbolic;
+    ctx.fillText(tables[i].rows, rx + 360, ty + 35);
+    ctx.font = `500 16px ${FONTS.body}`;
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillText(tables[i].desc, rx + 50, ty + 66);
+  }
+
+  // Live Event Stream Log
+  drawRoundedRect(rx + 28, ry + 505, rw - 56, 260, 14, '#0a0d14', 'rgba(255, 215, 0, 0.35)', 1.5);
+  ctx.font = `700 16px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.symbolic;
+  ctx.fillText('LIVE EVENT BUS (WEBSOCKET / SUPABASE REALTIME):', rx + 50, ry + 542);
+
+  const events = [
+    '[06:42:01.120] EVENT pose_updated       -> user=director_01 pos=[2.41, 1.65, -1.08] (15.8ms)',
+    '[06:42:01.450] EVENT scene_updated      -> +3 RDF triples committed to venue_states',
+    '[06:42:02.010] EVENT training_feedback  -> step=1 prolog_valid=truelatency=2.8ms',
+    '[06:42:02.640] EVENT asset_generated    -> id=chair_v4 z3_sat=true mesh_tris=24,800'
+  ];
+  ctx.font = `500 15px ${FONTS.code}`;
+  for (let i = 0; i < events.length; i++) {
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillText(events[i], rx + 50, ry + 585 + i * 40);
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 8: PERFORMANCE METRICS (Animated Bar Charts & Target Validation)
+// ============================================================================
+function renderScenePerformanceMetrics(p, globalTime) {
+  const metrics = [
+    { name: 'Hybrid SLAM Tracking Latency', value: '16.0 ms', target: 'Target: < 20.0 ms (60 FPS)', ratio: 0.88, col: COLORS.success, sub: 'Visual-Inertial Odometry + Semantic Loop Closure' },
+    { name: 'Prolog Training Step Validation', value: '3.0 ms', target: 'Target: < 5.0 ms (Real-time)', ratio: 0.94, col: COLORS.neural, sub: '21-Joint Hand Skeleton + Precondition Rule Inference' },
+    { name: 'Full 3D Scene Understanding', value: '8.3 s', target: 'Target: < 10.0 s (Multi-view)', ratio: 0.85, col: COLORS.symbolic, sub: '3DGS Optimization + SAM 2 Segmentation + CLIP + RDF Graph' },
+    { name: 'Constrained 3D Asset Generation', value: '10.2 s', target: 'Target: ~10.0 s (Verified)', ratio: 0.82, col: '#38BDF8', sub: 'Z3 Geometric Constraint Solving + 3D Diffusion Synthesis' }
+  ];
+
+  const grow = easeOutCubic(clamp(p * 1.8));
+  ctx.save();
+  for (let i = 0; i < metrics.length; i++) {
+    const m = metrics[i];
+    const y = 135 + i * 185;
+    drawRoundedRect(90, y, W - 180, 160, 18, 'rgba(18, 23, 36, 0.94)', 'rgba(255,255,255,0.14)', 1.5);
+
+    ctx.font = `800 26px ${FONTS.title}`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(m.name, 130, y + 48);
+
+    ctx.font = `500 18px ${FONTS.body}`;
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillText(m.sub, 130, y + 80);
+
+    // Animated Progress Bar
+    const barX = 130, barY = y + 104, barW = 1180, barH = 28;
+    drawRoundedRect(barX, barY, barW, barH, 14, 'rgba(255,255,255,0.08)', null);
+    drawRoundedRect(barX, barY, Math.max(28, barW * m.ratio * grow), barH, 14, m.col, null);
+
+    // Value & Checkmark on the right
+    ctx.textAlign = 'right';
+    ctx.font = `800 42px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.success;
+    ctx.fillText(`${m.value} ✓`, W - 135, y + 68);
+
+    ctx.font = `600 17px ${FONTS.code}`;
+    ctx.fillStyle = COLORS.symbolicLight;
+    ctx.fillText(m.target, W - 135, y + 115);
+    ctx.textAlign = 'left';
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 9: TECHNICAL STACK (3 Architectural Columns)
+// ============================================================================
+function renderSceneTechStack(p, globalTime) {
+  const cols = [
+    {
+      title: 'NEURAL PERCEPTION',
+      subtitle: 'Deep Learning & 3D Vision',
+      color: COLORS.neural,
+      items: [
+        ['3D Gaussian Splatting (gsplat)', 'Real-time radiance field capture & adaptive density'],
+        ['Meta SAM 2 (ViT-H)', 'Zero-shot temporal object segmentation in 3D scenes'],
+        ['OpenAI CLIP (ViT-L/14)', '428M param visual-language semantic grounding'],
+        ['Stable Diffusion + ControlNet', 'Conditioned multi-view 3D mesh & texture synthesis'],
+        ['ORB-SLAM3 + MediaPipe', '60 FPS 6-DOF visual-inertial & 21-joint hand tracking']
+      ]
+    },
+    {
+      title: 'SYMBOLIC REASONING',
+      subtitle: 'Formal Logic & Knowledge Graphs',
+      color: COLORS.symbolic,
+      items: [
+        ['RDFLib & OWL Ontologies', 'Queryable spatial scene graphs & SPARQL inference'],
+        ['SWI-Prolog (PySwip)', 'Declarative procedural rules & precondition checking'],
+        ['Microsoft Z3 SMT Solver', 'Formal geometric, symmetry & stability verification'],
+        ['Topological Semantic Memory', 'Cross-session persistent object & place recognition'],
+        ['Bidirectional Bridge', 'Continuous tensor ⇄ discrete predicate translation']
+      ]
+    },
+    {
+      title: 'XR & PLATFORM INFRA',
+      subtitle: 'Production Deployment Stack',
+      color: COLORS.success,
+      items: [
+        ['Poetics VR Platform', 'Unified venue management & multi-user orchestration'],
+        ['Supabase (PostgreSQL + pgvector)', 'Real-time state sync, sessions & hybrid vector search'],
+        ['FastAPI + AsyncIO', 'High-throughput asynchronous Python microservice API'],
+        ['OpenXR 1.1 & Unity / WebXR', 'Cross-platform headset integration (Quest 3 / Vision Pro)'],
+        ['PyTorch 2.5 + CUDA', 'Hardware-accelerated neural & symbolic execution']
+      ]
+    }
+  ];
+
+  ctx.save();
+  for (let c = 0; c < 3; c++) {
+    const col = cols[c];
+    const x = 70 + c * 605;
+    const y = 120;
+    const w = 575;
+    const h = 790;
+    drawRoundedRect(x, y, w, h, 20, 'rgba(18, 22, 34, 0.94)', col.color, 2.2);
+
+    ctx.font = `800 26px ${FONTS.title}`;
+    ctx.fillStyle = col.color;
+    ctx.fillText(col.title, x + 32, y + 52);
+
+    ctx.font = `500 17px ${FONTS.body}`;
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.fillText(col.subtitle, x + 32, y + 82);
+
+    for (let i = 0; i < col.items.length; i++) {
+      const iy = y + 115 + i * 128;
+      drawRoundedRect(x + 26, iy, w - 52, 110, 14, 'rgba(28, 34, 52, 0.85)', 'rgba(255,255,255,0.1)', 1.2);
+      ctx.font = `700 20px ${FONTS.title}`;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(col.items[i][0], x + 48, iy + 42);
+
+      ctx.font = `500 16px ${FONTS.body}`;
+      ctx.fillStyle = '#CBD5E1';
+      ctx.fillText(col.items[i][1], x + 48, iy + 78);
+    }
+  }
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 10: CALL TO ACTION (GitHub, Docs, Quickstart & QR Code)
+// ============================================================================
+function renderSceneCTA(p, globalTime) {
+  ctx.save();
+  // Left Card: GitHub Repository & Quickstart CLI
+  drawRoundedRect(80, 125, 1120, 780, 22, 'rgba(16, 20, 32, 0.95)', COLORS.neural, 2.2);
+  drawBadge(115, 155, 'OPEN SOURCE & PRODUCTION READY', 'rgba(0, 255, 102, 0.2)', COLORS.success, COLORS.success);
+
+  ctx.font = `800 44px ${FONTS.title}`;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('Get Started with Neurosymbolic XR', 115, 240);
+
+  ctx.font = `500 22px ${FONTS.body}`;
+  ctx.fillStyle = '#CBD5E1';
+  ctx.fillText('22 Production Files  •  6,500+ Lines of Code  •  4 Complete AI Systems  •  Poetics VR Ready', 115, 286);
+
+  // Quickstart Terminal Box
+  drawRoundedRect(115, 325, 1050, 270, 16, '#0b0e17', 'rgba(255,255,255,0.15)', 1.5);
+  const cli = [
+    '$ git clone https://github.com/poetics-vr/neurosymbolic-xr.git',
+    '$ cd neurosymbolic-xr && uv sync',
+    '$ uv run python demo.py',
+    '✓ Spatial Reasoning Engine initialized (3DGS + SAM 2 + CLIP + RDF)',
+    '✓ Hybrid SLAM initialized (16ms tracking + persistent semantic memory)',
+    '✓ VR Training Assistant & Z3 Asset Generator ready!'
+  ];
+  ctx.font = `500 19px ${FONTS.code}`;
+  for (let i = 0; i < cli.length; i++) {
+    ctx.fillStyle = cli[i].startsWith('✓') ? COLORS.success : (cli[i].startsWith('$') ? COLORS.neuralLight : '#fff');
+    ctx.fillText(cli[i], 145, 372 + i * 38);
+  }
+
+  // Resource Links
+  const links = [
+    ['💻 GitHub Repository:', 'github.com/poetics-vr/neurosymbolic-xr'],
+    ['📚 Documentation:', 'docs.neurosymbolic-xr.org'],
+    ['💬 Community Discord:', 'discord.gg/neurosymbolic-xr']
+  ];
+  for (let i = 0; i < links.length; i++) {
+    const ly = 640 + i * 75;
+    drawRoundedRect(115, ly, 1050, 60, 12, 'rgba(30, 144, 255, 0.12)', 'rgba(30, 144, 255, 0.35)', 1.5);
+    ctx.font = `700 20px ${FONTS.body}`;
+    ctx.fillStyle = COLORS.symbolic;
+    ctx.fillText(links[i][0], 145, ly + 37);
+    ctx.font = `600 20px ${FONTS.code}`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(links[i][1], 430, ly + 37);
+  }
+
+  // Right Card: Stylized QR Code & Architecture Summary
+  drawRoundedRect(1240, 125, 600, 780, 22, 'rgba(18, 22, 34, 0.95)', COLORS.symbolic, 2.2);
+  ctx.textAlign = 'center';
+  ctx.font = `800 28px ${FONTS.title}`;
+  ctx.fillStyle = COLORS.symbolic;
+  ctx.fillText('SCAN FOR QUICKSTART', 1540, 195);
+
+  // Stylized deterministic QR Matrix
+  const qrSize = 320;
+  const qx = 1540 - qrSize / 2;
+  const qy = 235;
+  drawRoundedRect(qx - 20, qy - 20, qrSize + 40, qrSize + 40, 18, '#FFFFFF', null);
+  const cells = 21;
+  const cellW = qrSize / cells;
+  ctx.fillStyle = '#0f172a';
+  for (let r = 0; r < cells; r++) {
+    for (let c = 0; c < cells; c++) {
+      const isCorner = (r < 7 && c < 7) || (r < 7 && c >= cells - 7) || (r >= cells - 7 && c < 7);
+      if (isCorner) {
+        if (r === 0 || r === 6 || c === 0 || c === 6 || r === cells - 1 || r === cells - 7 || c === cells - 1 || c === cells - 7 || (r >= 2 && r <= 4 && c >= 2 && c <= 4) || (r >= 2 && r <= 4 && c >= cells - 5 && c <= cells - 3) || (r >= cells - 5 && r <= cells - 3 && c >= 2 && c <= 4)) {
+          ctx.fillRect(qx + c * cellW, qy + r * cellW, cellW + 0.5, cellW + 0.5);
+        }
+      } else if (seededRandom(r * 31 + c * 17) > 0.46) {
+        ctx.fillRect(qx + c * cellW, qy + r * cellW, cellW + 0.5, cellW + 0.5);
+      }
+    }
+  }
+
+  ctx.font = `700 22px ${FONTS.title}`;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('Poetics VR Platform', 1540, 645);
+  ctx.font = `500 18px ${FONTS.body}`;
+  ctx.fillStyle = COLORS.textMuted;
+  ctx.fillText('Transform your XR venues with', 1540, 685);
+  ctx.fillText('neural perception + symbolic reasoning.', 1540, 715);
+  ctx.restore();
+}
+
+// ============================================================================
+// YOUTUBE THUMBNAIL RENDERER (1920x1080 High-Impact)
+// ============================================================================
+function renderThumbnail() {
+  drawBackground(4.2);
+  renderSceneOpeningOrClosing(0.65, 4.2, false);
+
+  // Bold YouTube Thumbnail Overlays
+  ctx.save();
+  drawRoundedRect(60, 50, 520, 68, 16, COLORS.neural, '#fff', 2.5);
+  ctx.font = `900 30px ${FONTS.title}`;
+  ctx.fillStyle = '#fff';
+  ctx.fillText('⚡ 3DGS + SAM 2 + CLIP', 92, 95);
+
+  drawRoundedRect(W - 580, 50, 520, 68, 16, COLORS.symbolic, '#111', 2.5);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText('🧠 RDF + PROLOG + Z3', W - 545, 95);
+
+  drawRoundedRect(W / 2 - 230, 560, 460, 64, 32, 'rgba(0, 255, 102, 0.2)', COLORS.success, 2.5);
+  ctx.textAlign = 'center';
+  ctx.font = `800 26px ${FONTS.code}`;
+  ctx.fillStyle = COLORS.success;
+  ctx.fillText('16ms XR LATENCY • 60 FPS', W / 2, 601);
+  ctx.restore();
+}
+
+// ============================================================================
+// MASTER DISPATCHER: window.renderAtTime(t, mode)
+// ============================================================================
+function renderSceneById(sceneId, localProgress, globalTime) {
+  switch (sceneId) {
+    case 1: return renderSceneOpeningOrClosing(localProgress, globalTime, false);
+    case 2: return renderSceneArchitecture(localProgress, globalTime);
+    case 3: return renderSceneSpatialReasoning(localProgress, globalTime);
+    case 4: return renderSceneHybridSlam(localProgress, globalTime);
+    case 5: return renderSceneTrainingAssistant(localProgress, globalTime);
+    case 6: return renderSceneAssetGenerator(localProgress, globalTime);
+    case 7: return renderScenePoeticsIntegration(localProgress, globalTime);
+    case 8: return renderScenePerformanceMetrics(localProgress, globalTime);
+    case 9: return renderSceneTechStack(localProgress, globalTime);
+    case 10: return renderSceneCTA(localProgress, globalTime);
+    case 11: return renderSceneOpeningOrClosing(localProgress, globalTime, true);
+    default: return renderSceneOpeningOrClosing(localProgress, globalTime, false);
+  }
+}
+
+window.renderAtTime = function(t, mode = 'main') {
+  if (mode === 'thumbnail') {
+    renderThumbnail();
+    return;
+  }
+
+  drawBackground(t);
+
+  if (mode === 'main') {
+    const scenes = TIMELINE.main.scenes;
+    const totalDur = TIMELINE.main.total_duration;
+    let active = scenes[scenes.length - 1];
+    for (const s of scenes) {
+      if (t >= s.start && t <= s.end) {
+        active = s;
+        break;
+      }
+    }
+    const localP = clamp((t - active.start) / Math.max(0.1, active.duration));
+    drawTopBar(active.id, active.title, t, totalDur, mode);
+    renderSceneById(active.id, localP, t);
+    drawSubtitleBar(active.vo_text, localP);
+
+    // Smooth 0.4s crossfade flash at scene boundaries
+    const timeInScene = t - active.start;
+    const timeLeft = active.end - t;
+    if (timeInScene < 0.35 && active.id > 1) {
+      ctx.fillStyle = `rgba(14, 16, 23, ${1 - timeInScene / 0.35})`;
+      ctx.fillRect(0, 0, W, H);
+    } else if (timeLeft < 0.35 && active.id === 11) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${1 - timeLeft / 0.35})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+  } else {
+    const cut = TIMELINE.cuts[mode];
+    if (!cut) return;
+    const segs = cut.segments;
+    const totalDur = cut.total_duration;
+    let active = segs[segs.length - 1];
+    for (const s of segs) {
+      if (t >= s.start && t <= s.end) {
+        active = s;
+        break;
+      }
+    }
+    const localP = clamp((t - active.start) / Math.max(0.1, active.duration));
+    const sceneObj = TIMELINE.main.scenes.find(x => x.id === active.scene_id) || { title: 'Neurosymbolic XR' };
+    drawTopBar(active.scene_id, sceneObj.title, t, totalDur, mode);
+    renderSceneById(active.scene_id, localP, t);
+    drawSubtitleBar(active.vo_text, localP);
+  }
+};
+
+// Interactive Player Controls for Browser Viewing
+let isPlaying = false;
+let currentMode = 'main';
+let currentTime = 0;
+let lastFrameTs = 0;
+
+const playBtn = document.getElementById('play-btn');
+const modeSelect = document.getElementById('mode-select');
+const scrub = document.getElementById('scrub');
+const timeDisplay = document.getElementById('time-display');
+
+function getModeDuration(m) {
+  if (m === 'thumbnail') return 1;
+  if (m === 'main') return TIMELINE.main.total_duration;
+  return TIMELINE.cuts[m] ? TIMELINE.cuts[m].total_duration : 60;
+}
+
+function fmtSec(s) {
+  const m = Math.floor(s / 60);
+  const sec = (s % 60).toFixed(1).padStart(4, '0');
+  return `${String(m).padStart(2, '0')}:${sec}`;
+}
+
+function updateUI() {
+  const maxD = getModeDuration(currentMode);
+  scrub.max = maxD;
+  scrub.value = currentTime;
+  timeDisplay.textContent = `${fmtSec(currentTime)} / ${fmtSec(maxD)}`;
+  window.renderAtTime(currentTime, currentMode);
+}
+
+playBtn.addEventListener('click', () => {
+  isPlaying = !isPlaying;
+  playBtn.textContent = isPlaying ? '⏸ Pause' : '▶ Play';
+  if (isPlaying) lastFrameTs = performance.now();
+});
+
+modeSelect.addEventListener('change', (e) => {
+  currentMode = e.target.value;
+  currentTime = 0;
+  isPlaying = false;
+  playBtn.textContent = '▶ Play';
+  updateUI();
+});
+
+scrub.addEventListener('input', (e) => {
+  currentTime = parseFloat(e.target.value);
+  updateUI();
+});
+
+function tick(ts) {
+  if (isPlaying) {
+    const dt = (ts - lastFrameTs) / 1000;
+    lastFrameTs = ts;
+    const maxD = getModeDuration(currentMode);
+    currentTime += dt;
+    if (currentTime >= maxD) {
+      currentTime = 0;
+      isPlaying = false;
+      playBtn.textContent = '▶ Play';
+    }
+    updateUI();
+  }
+  requestAnimationFrame(tick);
+}
+
+// Try loading scene_timings.json if opened directly via local server
+fetch('./scene_timings.json')
+  .then(r => r.json())
+  .then(data => {
+    window.setTimelineData(data);
+    updateUI();
+  })
+  .catch(() => updateUI());
+
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

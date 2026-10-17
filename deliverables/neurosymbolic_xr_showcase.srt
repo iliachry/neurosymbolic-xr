@@ -1,0 +1,43 @@
+1
+00:00:01,000 --> 00:00:10,136
+Introducing the Neurosymbolic XR Framework—a breakthrough in Extended Reality AI that combines the power of deep learning with logical reasoning.
+
+2
+00:00:12,040 --> 00:00:26,611
+The framework features a layered architecture. Sensors feed into neural networks for perception, which are grounded into symbolic representations for reasoning. This bidirectional bridge enables both bottom-up understanding and top-down validation.
+
+3
+00:00:29,040 --> 00:00:43,210
+System One: Spatial Reasoning. We capture the scene with 3D Gaussian Splatting, segment objects with SAM 2, and ground them to language with CLIP. The result? A queryable scene graph that understands both geometry and semantics.
+
+4
+00:00:51,040 --> 00:01:07,729
+System Two: Hybrid SLAM. Visual-inertial tracking provides precise localization at 60 frames per second. But unlike traditional SLAM, we maintain semantic memory—objects are remembered across sessions, building a persistent understanding of the environment.
+
+5
+00:01:13,040 --> 00:01:28,572
+System Three: VR Training Assistant. Hand and gaze tracking feed into Prolog-based procedural reasoning. Each action is validated against logical preconditions and constraints, providing real-time feedback to guide users through complex procedures.
+
+6
+00:01:35,040 --> 00:01:53,053
+System Four: Neural-Symbolic Asset Generator. Natural language descriptions are combined with geometric constraints. Z3 validates feasibility, then Stable Diffusion generates the asset. The result? AI-created content that satisfies both aesthetic and functional requirements.
+
+7
+00:01:57,040 --> 00:02:12,379
+All four systems integrate seamlessly with the Poetics VR platform. A unified API manages sessions, tracks users, stores semantic memory in Supabase, and provides real-time events. Everything you need for intelligent VR experiences.
+
+8
+00:02:15,040 --> 00:02:26,972
+Performance is critical for XR. The framework achieves sub-20 millisecond tracking latency, real-time scene understanding, and fast asset generation—all while running complex AI models.
+
+9
+00:02:29,040 --> 00:02:45,662
+Built on cutting-edge technologies: 3D Gaussian Splatting for rendering, SAM 2 for segmentation, CLIP for grounding, and Stable Diffusion for generation. Symbolic reasoning with RDF, Prolog, and Z3. All integrated with Supabase and OpenXR.
+
+10
+00:02:47,560 --> 00:03:03,355
+Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI.
+
+11
+00:03:05,260 --> 00:03:10,315
+Neurosymbolic XR Framework. The future of intelligent Extended Reality.

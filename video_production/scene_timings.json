@@ -1,0 +1,340 @@
+{
+  "main": {
+    "total_duration": 192.46,
+    "audio_path": "/Users/iliaschrysovergis/Desktop/neurosymbolic-xr/video_production/audio/main_showcase_mix.wav",
+    "scenes": [
+      {
+        "id": 1,
+        "key": "opening",
+        "title": "Opening Title",
+        "start": 0.0,
+        "end": 11.24,
+        "duration": 11.24,
+        "vo_start": 1.0,
+        "vo_end": 10.136,
+        "vo_duration": 9.136,
+        "vo_text": "Introducing the Neurosymbolic XR Framework\u2014a breakthrough in Extended Reality AI that combines the power of deep learning with logical reasoning."
+      },
+      {
+        "id": 2,
+        "key": "architecture",
+        "title": "Architecture Overview",
+        "start": 11.24,
+        "end": 28.24,
+        "duration": 17.0,
+        "vo_start": 12.04,
+        "vo_end": 26.611,
+        "vo_duration": 14.571,
+        "vo_text": "The framework features a layered architecture. Sensors feed into neural networks for perception, which are grounded into symbolic representations for reasoning. This bidirectional bridge enables both bottom-up understanding and top-down validation."
+      },
+      {
+        "id": 3,
+        "key": "spatial_reasoning",
+        "title": "System 1: Spatial Reasoning",
+        "start": 28.24,
+        "end": 50.24,
+        "duration": 22.0,
+        "vo_start": 29.04,
+        "vo_end": 43.21,
+        "vo_duration": 14.17,
+        "vo_text": "System One: Spatial Reasoning. We capture the scene with 3D Gaussian Splatting, segment objects with SAM 2, and ground them to language with CLIP. The result? A queryable scene graph that understands both geometry and semantics."
+      },
+      {
+        "id": 4,
+        "key": "hybrid_slam",
+        "title": "System 2: Hybrid SLAM",
+        "start": 50.24,
+        "end": 72.24,
+        "duration": 22.0,
+        "vo_start": 51.04,
+        "vo_end": 67.729,
+        "vo_duration": 16.689,
+        "vo_text": "System Two: Hybrid SLAM. Visual-inertial tracking provides precise localization at 60 frames per second. But unlike traditional SLAM, we maintain semantic memory\u2014objects are remembered across sessions, building a persistent understanding of the environment."
+      },
+      {
+        "id": 5,
+        "key": "training_assistant",
+        "title": "System 3: VR Training Assistant",
+        "start": 72.24,
+        "end": 94.24,
+        "duration": 22.0,
+        "vo_start": 73.04,
+        "vo_end": 88.572,
+        "vo_duration": 15.532,
+        "vo_text": "System Three: VR Training Assistant. Hand and gaze tracking feed into Prolog-based procedural reasoning. Each action is validated against logical preconditions and constraints, providing real-time feedback to guide users through complex procedures."
+      },
+      {
+        "id": 6,
+        "key": "asset_generator",
+        "title": "System 4: Neural-Symbolic Asset Generator",
+        "start": 94.24,
+        "end": 116.24,
+        "duration": 22.0,
+        "vo_start": 95.04,
+        "vo_end": 113.053,
+        "vo_duration": 18.013,
+        "vo_text": "System Four: Neural-Symbolic Asset Generator. Natural language descriptions are combined with geometric constraints. Z3 validates feasibility, then Stable Diffusion generates the asset. The result? AI-created content that satisfies both aesthetic and functional requirements."
+      },
+      {
+        "id": 7,
+        "key": "poetics_integration",
+        "title": "Poetics Platform Integration",
+        "start": 116.24,
+        "end": 134.24,
+        "duration": 18.0,
+        "vo_start": 117.04,
+        "vo_end": 132.379,
+        "vo_duration": 15.339,
+        "vo_text": "All four systems integrate seamlessly with the Poetics VR platform. A unified API manages sessions, tracks users, stores semantic memory in Supabase, and provides real-time events. Everything you need for intelligent VR experiences."
+      },
+      {
+        "id": 8,
+        "key": "performance_metrics",
+        "title": "Performance Metrics",
+        "start": 134.24,
+        "end": 148.24,
+        "duration": 14.0,
+        "vo_start": 135.04,
+        "vo_end": 146.972,
+        "vo_duration": 11.932,
+        "vo_text": "Performance is critical for XR. The framework achieves sub-20 millisecond tracking latency, real-time scene understanding, and fast asset generation\u2014all while running complex AI models."
+      },
+      {
+        "id": 9,
+        "key": "tech_stack",
+        "title": "Technical Stack",
+        "start": 148.24,
+        "end": 166.76,
+        "duration": 18.52,
+        "vo_start": 149.04,
+        "vo_end": 165.662,
+        "vo_duration": 16.622,
+        "vo_text": "Built on cutting-edge technologies: 3D Gaussian Splatting for rendering, SAM 2 for segmentation, CLIP for grounding, and Stable Diffusion for generation. Symbolic reasoning with RDF, Prolog, and Z3. All integrated with Supabase and OpenXR."
+      },
+      {
+        "id": 10,
+        "key": "call_to_action",
+        "title": "Call to Action",
+        "start": 166.76,
+        "end": 184.46,
+        "duration": 17.7,
+        "vo_start": 167.56,
+        "vo_end": 183.355,
+        "vo_duration": 15.795,
+        "vo_text": "Ready to build intelligent VR experiences? The Neurosymbolic XR Framework is open source and production-ready. Visit our GitHub for documentation, examples, and community support. Transform your VR applications with the power of neurosymbolic AI."
+      },
+      {
+        "id": 11,
+        "key": "closing",
+        "title": "Closing",
+        "start": 184.46,
+        "end": 192.46,
+        "duration": 8.0,
+        "vo_start": 185.26,
+        "vo_end": 190.315,
+        "vo_duration": 5.055,
+        "vo_text": "Neurosymbolic XR Framework. The future of intelligent Extended Reality."
+      }
+    ]
+  },
+  "cuts": {
+    "60s": {
+      "total_duration": 60.499,
+      "audio_path": "/Users/iliaschrysovergis/Desktop/neurosymbolic-xr/video_production/audio/cut_60s_mix.wav",
+      "segments": [
+        {
+          "index": 1,
+          "scene_id": 1,
+          "start": 0.0,
+          "end": 8.61,
+          "duration": 8.61,
+          "vo_start": 0.15,
+          "vo_end": 8.41,
+          "vo_text": "Introducing the Neurosymbolic XR Framework\u2014bridging deep neural perception with symbolic logical reasoning for Extended Reality."
+        },
+        {
+          "index": 2,
+          "scene_id": 2,
+          "start": 8.61,
+          "end": 16.174,
+          "duration": 7.564,
+          "vo_start": 8.76,
+          "vo_end": 15.974,
+          "vo_text": "A bidirectional grounding bridge connects 3D neural sensors directly to formal knowledge graphs and logic solvers."
+        },
+        {
+          "index": 3,
+          "scene_id": 3,
+          "start": 16.174,
+          "end": 24.681,
+          "duration": 8.507,
+          "vo_start": 16.624,
+          "vo_end": 23.626,
+          "vo_text": "System One fuses 3D Gaussian Splatting, SAM 2, and CLIP into a queryable RDF spatial scene graph."
+        },
+        {
+          "index": 4,
+          "scene_id": 4,
+          "start": 24.681,
+          "end": 32.243,
+          "duration": 7.562,
+          "vo_start": 25.131,
+          "vo_end": 31.335,
+          "vo_text": "System Two delivers 16-millisecond Hybrid SLAM with persistent cross-session semantic memory."
+        },
+        {
+          "index": 5,
+          "scene_id": 5,
+          "start": 32.243,
+          "end": 39.805,
+          "duration": 7.562,
+          "vo_start": 32.693,
+          "vo_end": 38.723,
+          "vo_text": "System Three validates VR hand and gaze procedures in real time using Prolog inference."
+        },
+        {
+          "index": 6,
+          "scene_id": 6,
+          "start": 39.805,
+          "end": 48.312,
+          "duration": 8.507,
+          "vo_start": 40.255,
+          "vo_end": 47.049,
+          "vo_text": "And System Four combines Z3 geometric constraint solving with 3D diffusion for verified asset generation."
+        },
+        {
+          "index": 7,
+          "scene_id": 7,
+          "start": 48.312,
+          "end": 54.929,
+          "duration": 6.617,
+          "vo_start": 48.706,
+          "vo_end": 54.197,
+          "vo_text": "Fully integrated with the Poetics VR platform and Supabase for real-time venue intelligence."
+        },
+        {
+          "index": 8,
+          "scene_id": 11,
+          "start": 54.929,
+          "end": 60.499,
+          "duration": 5.57,
+          "vo_start": 55.079,
+          "vo_end": 60.299,
+          "vo_text": "Neurosymbolic XR Framework. Open-source and ready for the future of spatial computing."
+        }
+      ]
+    },
+    "30s": {
+      "total_duration": 31.096,
+      "audio_path": "/Users/iliaschrysovergis/Desktop/neurosymbolic-xr/video_production/audio/cut_30s_mix.wav",
+      "segments": [
+        {
+          "index": 1,
+          "scene_id": 1,
+          "start": 0.0,
+          "end": 6.116,
+          "duration": 6.116,
+          "vo_start": 0.15,
+          "vo_end": 5.916,
+          "vo_text": "Meet the Neurosymbolic XR Framework: where neural perception meets symbolic logic in VR."
+        },
+        {
+          "index": 2,
+          "scene_id": 3,
+          "start": 6.116,
+          "end": 12.338,
+          "duration": 6.222,
+          "vo_start": 6.266,
+          "vo_end": 12.138,
+          "vo_text": "Capture 3D scenes with Gaussian Splatting, SAM 2, and CLIP into live RDF scene graphs."
+        },
+        {
+          "index": 3,
+          "scene_id": 4,
+          "start": 12.338,
+          "end": 17.308,
+          "duration": 4.97,
+          "vo_start": 12.624,
+          "vo_end": 16.777,
+          "vo_text": "Track at 60 FPS with Hybrid SLAM and persistent semantic memory."
+        },
+        {
+          "index": 4,
+          "scene_id": 5,
+          "start": 17.308,
+          "end": 22.947,
+          "duration": 5.639,
+          "vo_start": 17.458,
+          "vo_end": 22.747,
+          "vo_text": "Validate VR training with Prolog rules and generate constrained 3D assets with Z3."
+        },
+        {
+          "index": 5,
+          "scene_id": 7,
+          "start": 22.947,
+          "end": 27.569,
+          "duration": 4.622,
+          "vo_start": 23.097,
+          "vo_end": 27.369,
+          "vo_text": "Powered by the Poetics VR platform with sub-20 millisecond latency."
+        },
+        {
+          "index": 6,
+          "scene_id": 11,
+          "start": 27.569,
+          "end": 31.096,
+          "duration": 3.527,
+          "vo_start": 27.719,
+          "vo_end": 30.896,
+          "vo_text": "Neurosymbolic XR. Build intelligent worlds today."
+        }
+      ]
+    },
+    "15s": {
+      "total_duration": 18.168,
+      "audio_path": "/Users/iliaschrysovergis/Desktop/neurosymbolic-xr/video_production/audio/cut_15s_mix.wav",
+      "segments": [
+        {
+          "index": 1,
+          "scene_id": 1,
+          "start": 0.0,
+          "end": 5.116,
+          "duration": 5.116,
+          "vo_start": 0.15,
+          "vo_end": 4.916,
+          "vo_text": "Neurosymbolic XR Framework: Neural perception meets symbolic reasoning."
+        },
+        {
+          "index": 2,
+          "scene_id": 3,
+          "start": 5.116,
+          "end": 11.352,
+          "duration": 6.236,
+          "vo_start": 5.266,
+          "vo_end": 11.152,
+          "vo_text": "3D Gaussian Splatting, SAM 2, CLIP, Prolog, and Z3 in one unified engine."
+        },
+        {
+          "index": 3,
+          "scene_id": 8,
+          "start": 11.352,
+          "end": 15.304,
+          "duration": 3.952,
+          "vo_start": 11.502,
+          "vo_end": 15.104,
+          "vo_text": "Four real-time AI systems built for the Poetics VR platform."
+        },
+        {
+          "index": 4,
+          "scene_id": 11,
+          "start": 15.304,
+          "end": 18.168,
+          "duration": 2.864,
+          "vo_start": 15.454,
+          "vo_end": 17.968,
+          "vo_text": "Experience the future of intelligent XR."
+        }
+      ]
+    }
+  }
+}
