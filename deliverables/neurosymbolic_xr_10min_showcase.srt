@@ -1,0 +1,79 @@
+1
+00:00:00,600 --> 00:00:24,186
+Welcome to the ten-minute technical showcase of the Neurosymbolic XR Framework integrated with ASTE VR at aste.iliachry.gr. Developed under H.F.R.I. Grant 26237 EduGenZ, this architecture unites neural spatial perception and formal symbolic verification with ten embodied WebXR escape chambers grounded in the Arnold and Wade systems thinking taxonomy.
+
+2
+00:00:25,600 --> 00:00:49,213
+Purely neural VR assistants hallucinate ungrounded hints and lack verifiable state provenance. Our shared neurosymbolic contract transforms sensor observations and authoritative WebXR engine events into typed predicates with explicit units, timestamps, and three-valued truth semantics—true, false, or unknown—ensuring every room verdict is backed by a formal proof trace.
+
+3
+00:00:50,600 --> 00:01:14,902
+In physical Location-Based VR deployments, System One reconstructs scenes with 3D Gaussian Splatting, isolates objects via SAM 2, and aligns open-vocabulary concepts with CLIP to populate an RDF and OWL knowledge graph. System Two pairs ORB-SLAM3 geometric tracking with semantic loop closure, maintaining persistent object memory across multi-room sessions.
+
+4
+00:01:20,600 --> 00:01:43,838
+System Three combines temporal hand-pose recognition with SWI-Prolog inference to verify procedural prerequisites and diagnose root-cause errors in real time. System Four couples diffusion-based 3D synthesis with the Z3 SMT constraint solver, guaranteeing that generated props satisfy bounding-box, support-surface, and collision invariants before entering the scene.
+
+5
+00:01:50,600 --> 00:02:14,190
+Let us now enter ASTE VR at aste.iliachry.gr, captured via deterministic Director Mode on the Three.js WebXR engine. The Macrocosm Constellation Hub maps ten progressive escape chambers to Arnold and Wade's 2015 and 2017 systems thinking skills, pairing first-person 6DoF locomotion with tactical radar, causal loop diagrams, and the Garmin virtual smartwatch.
+
+6
+00:02:15,600 --> 00:02:49,208
+Room One, The Forgotten Boundary, targets Skills 2.1 and 2.2: recognizing systems and maintaining boundaries. The learner rotates the central Vernier Handwheel to expand the boundary radius from 2.2 to 3.2 meters, enclosing relevant elements—reservoir, inflow pipe, soil moisture, and garden bed—while excluding environmental noise. Our symbolic verifier enforces boundary integrity I of B at least 0.70 alongside balanced inflow and outflow at 70 units, rejecting counterexamples where the tank is filled under an invalid boundary.
+
+7
+00:02:50,600 --> 00:03:24,206
+Room Two, The Hall of Scale and Quantity, operationalizes Skill 2.3: differentiating and quantifying elements. Three deceptive pedestals display the numeral ten across incompatible physical quantity kinds: discrete item count, continuous length in meters, and duration in seconds. The neurosymbolic verifier enforces dimensional homogeneity—two quantities are comparable only if they share quantity kind and compatible units—and requires explicit rejection of false equivalences such as comparing 24 square centimeters of area against 20 centimeters of length.
+
+8
+00:03:25,600 --> 00:03:59,134
+Room Three, The River of Relationships, trains Skills 3.1 and 3.2: identifying and characterizing causal relationships. Using the Relation Weaver console, the player inserts the intermediate mediator node and assigns signed causal polarities matching the partial-derivative Jacobian of the underlying system. Positive inflow links accumulate stock, whereas the outflow-to-stock edge carries negative polarity. Any reversed arrow, missing mediator, or unpredicted pulse trajectory is deterministically flagged by the symbolic rule engine.
+
+9
+00:04:00,600 --> 00:04:32,567
+Room Four, Echo Forest, addresses Skills 3.3 and 3.4: feedback loop polarity and propagation delays. The learner inspects closed causal cycles where loop polarity equals the product of signed edges—plus one for runaway reinforcing loops and minus one for stabilizing balancing loops. Crucially, the Rotary Delay Dial introduces phase lag tau. The verifier requires the learner to wait across the full delay horizon after intervening, rejecting premature over-corrections that trigger oscillation.
+
+10
+00:04:35,600 --> 00:05:08,655
+Room Five, The Valley of Time, targets Skills 4.1 through 4.3: dynamic accumulation and trajectory prediction. Through the Chronos Lens, the learner integrates discrete stock conservation—S at k plus one equals S at k plus delta-t times net inflow minus outflow. Our verification contract mandates that the learner record a forward prediction before revealing the future trajectory, while Astra probes a classic misconception: equal inflow and outflow imply a constant stock level, not an empty reservoir.
+
+11
+00:05:10,600 --> 00:05:41,762
+Room Six, Prism Mountain, cultivates Skill 1.1: considering multiple perspectives. Rotating the tri-faceted Perspective Prism reframes the chamber across three distinct stakeholder lenses: Pupil engagement, Teacher curriculum alignment, and Designer 6DoF ergonomic comfort. Simply cycling the three optical lenses is insufficient for symbolic mastery; the verifier requires supported concerns for all three stakeholders and an explicit trade-off justification balancing competing objectives.
+
+12
+00:05:45,600 --> 00:06:15,104
+Room Seven, The Garden of Models, trains Skill 1.5: mental models and abstraction. Using the Model Seed Kit, the learner prunes spurious environmental noise branches—such as ambient chimes and cloud color—while preserving causally essential variables like inflow, outflow, and soil absorption. The symbolic evaluator scores model adequacy via held-out prediction error plus a complexity penalty lambda, rejecting any model that prunes a causally essential mechanism.
+
+13
+00:06:20,600 --> 00:06:49,491
+Room Eight, The Seed of Change, focuses on Skill 4.4: high-leverage structural interventions. Learners compare candidate policy actions across a multi-step horizon under matched initial conditions and budget constraints. Rather than rewarding low-impact symptomatic buffers, the Z3-backed verifier identifies the optimal structural intervention that modifies feedback gain rules, maximizing long-horizon stability net of intervention cost.
+
+14
+00:06:55,600 --> 00:07:26,028
+Room Nine, The Emergence Chamber, serves as an integrated transfer assessment across all systems thinking skills. Managing a coupled multi-district urban water network with hidden aquifer delays, learners discover how locally greedy district withdrawals trigger counter-intuitive macro depletion. Verification requires keeping total extraction within aquifer capacity, achieving macro Gini stability above 0.80, and comparing the coordinated policy against an uncoordinated ablation baseline.
+
+15
+00:07:30,600 --> 00:08:00,787
+Room Ten, The Reflection Observatory, consolidates metacognitive evidence across the entire expedition. Every reflection claim submitted by the learner must resolve to verified session event identifiers in the provenance log and document at least one belief revision triggered by a disconfirming observation. Critically, our audit contract preserves scientific rigor: in-game chamber completion is recorded as behavioral trace evidence, distinct from externally validated psychometric competency.
+
+16
+00:08:05,600 --> 00:08:34,212
+Throughout all ten chambers, the Virtual Wrist Watch integrates physiological telemetry from the Garmin BLE Heart Rate Service over WebSocket. To prevent fabricated physiological claims, our BiometricPacket verifier enforces four explicit provenance states: live, simulated, stale beyond five seconds, and unavailable. Heart-rate variability RMSSD is computed strictly from adjacent RR intervals between 250 and 2000 milliseconds, never bridging across dropped beats.
+
+17
+00:08:35,600 --> 00:09:04,198
+When a learner stalls or violates a room invariant, the Astra Socratic companion generates scaffolding gated by our symbolic verifier. Every candidate utterance must reference a grounded entity in the active room's scene graph, pass a whole-word non-leakage check blocking direct solution tokens, and end as a Socratic question. Simultaneously, the Educator Cockpit and Poetics venue adapter maintain isolated per-session telemetry streams for teachers and multi-pod classrooms.
+
+18
+00:09:05,600 --> 00:09:34,188
+All ten room verifiers, biometric provenance transitions, and Socratic gate branches are verified by automated unit tests in test_aste_integration.py, rejecting every synthetic counterexample in under two milliseconds. Our five-phase continuation roadmap extends this foundation with the shared aste_systems OWL ontology, real-time WebSocket grounding, Z3 adaptive puzzle scheduling, GX10 Blackwell LLM Socratic generation, and multi-pod Poetics venue trials.
+
+19
+00:09:35,600 --> 00:09:49,422
+Every URL and publication cited in this showcase is live and verified online: the open-source repository at github.com/iliachry/neurosymbolic-xr, the live WebXR platform at aste.iliachry.gr, and foundational peer-reviewed DOIs by Arnold and Wade.
+
+20
+00:09:50,600 --> 00:09:58,502
+Neurosymbolic XR and ASTE VR: where neural perception meets formal symbolic verification for embodied systems thinking.

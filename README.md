@@ -348,23 +348,48 @@ asset = nxr.generate_asset(spec)
 This framework integrates seamlessly with the Poetics VR platform:
 
 ```python
-from neurosymbolic_xr.integration import PoeticsAdapter
+from src.integration.poetics import create_poetics_integration
+from src.integration.aste import ASTENeurosymbolicVerifier, BiometricPacket, BiometricProvenance
 
-# Connect to Poetics backend
-adapter = PoeticsAdapter(
-    supabase_url=os.getenv("VITE_SUPABASE_URL"),
-    supabase_key=os.getenv("VITE_SUPABASE_PUBLISHABLE_KEY")
+# 1. Verify ASTE VR (https://aste.iliachry.gr) escape room invariants (Rooms 1..10)
+verifier = ASTENeurosymbolicVerifier()
+room1_verdict = verifier.verify_room(
+    1,
+    relevant_items={"reservoir", "inflow_pipe", "soil_moisture", "garden_bed"},
+    noise_items={"distant_bell", "birdsong"},
+    inside_boundary={"reservoir", "inflow_pipe", "soil_moisture", "garden_bed"},
+    reservoir_stock=70.0,
+    inflow_rate=6.0,
+    outflow_rate=6.0,
+    dwell_seconds=3.0,
 )
 
-# Enhance venue with spatial reasoning
-venue = adapter.get_venue(organization_id)
-spatial_model = nxr.analyze_venue(venue)
+# 2. Validate Garmin BLE Virtual Wrist Watch provenance & adjacent-beat RMSSD
+packet = BiometricPacket(
+    heart_rate_bpm=78.0,
+    rr_intervals_ms=[800.0, 820.0, 790.0, 810.0],
+    observed_at=100.0,
+    source_mode=BiometricProvenance.LIVE,
+)
+rmssd_ms, provenance = packet.compute_rmssd_ms(current_time=101.5)
 
-# Add training procedures to pods
-pod = adapter.get_pod(pod_id)
-training = nxr.create_training_for_pod(pod, procedure_spec)
-adapter.deploy_training(pod_id, training)
+# 3. Gate Astra Socratic companion hints for entity grounding & non-leakage
+ok, reason = ASTENeurosymbolicVerifier.verify_socratic_hint_gate(
+    room1_verdict.astra_prompt,
+    grounded_entities=ASTENeurosymbolicVerifier.ROOM_SPECS[1]["entities"],
+    forbidden_solution_tokens={"auto_solve", "set radius to 3.2"},
+)
 ```
+
+## 🎬 Video Showcases (`deliverables/`)
+
+- **10-Minute Extended Technical Showcase (`10:00` · Neurosymbolic XR × ASTE VR `aste.iliachry.gr`)**:
+  - [`deliverables/neurosymbolic_xr_10min_showcase.mp4`](deliverables/neurosymbolic_xr_10min_showcase.mp4) — Full `1920x1080` `24 fps` master (`600.0s`)
+  - [`deliverables/neurosymbolic_xr_10min_compressed.mp4`](deliverables/neurosymbolic_xr_10min_compressed.mp4) — `< 20 MB` (`< 20,000,000 bytes`) 2-pass size-controlled edition (`600.0s`)
+  - [`deliverables/neurosymbolic_xr_10min_showcase.srt`](deliverables/neurosymbolic_xr_10min_showcase.srt) — Frame-aligned subtitles (`20 scenes`)
+- **3-Minute Executive Showcase & Social Cuts**:
+  - [`deliverables/neurosymbolic_xr_showcase.mp4`](deliverables/neurosymbolic_xr_showcase.mp4) (`3m 14s` master) & [`deliverables/neurosymbolic_xr_showcase_compressed.mp4`](deliverables/neurosymbolic_xr_showcase_compressed.mp4) (`< 20 MB`)
+  - [`deliverables/neurosymbolic_xr_60s_cut.mp4`](deliverables/neurosymbolic_xr_60s_cut.mp4), [`deliverables/neurosymbolic_xr_30s_cut.mp4`](deliverables/neurosymbolic_xr_30s_cut.mp4), [`deliverables/neurosymbolic_xr_15s_cut.mp4`](deliverables/neurosymbolic_xr_15s_cut.mp4)
 
 ## 📊 Performance Benchmarks
 
@@ -374,12 +399,15 @@ adapter.deploy_training(pod_id, training)
 | SAM 2 Segmentation | 45ms | 22 FPS | RTX 4090 |
 | Spatial Query | 12ms | - | CPU |
 | Constraint Validation | 3ms | - | CPU |
+| ASTE 10-Room Symbolic Verifier (`test_aste_integration.py`) | < 2ms (13 tests) | - | Apple M4 |
 | SLAM Tracking | 11ms | 90 Hz | Quest 3 |
 
 ## 🎓 Research Foundation
 
-This framework implements concepts from:
+This framework implements and integrates concepts from:
 
+- **Arnold, R. D., & Wade, J. P. (2015).** *A Definition of Systems Thinking: A Systems Approach.* Procedia Computer Science, 44, 669–678. ([DOI: 10.1016/j.procs.2015.03.050](https://doi.org/10.1016/j.procs.2015.03.050))
+- **Arnold, R. D., & Wade, J. P. (2017).** *A Complete Set of Systems Thinking Skills.* INSIGHT, 20(3), 9–17. ([DOI: 10.1002/inst.12159](https://doi.org/10.1002/inst.12159))
 - **Neural Radiance Fields** (Mildenhall et al., 2020)
 - **3D Gaussian Splatting** (Kerbl et al., 2023)
 - **SAM 2** (Ravi et al., 2024)
@@ -391,10 +419,12 @@ This framework implements concepts from:
 
 ## 📖 Documentation
 
+- [Engineering Continuation Roadmap (`ROADMAP.md`)](ROADMAP.md)
+- [10-Minute Extended Video Script (`VIDEO_SCRIPT_10MIN.md`)](VIDEO_SCRIPT_10MIN.md)
 - [Architecture Overview](ARCHITECTURE.md)
 - [Quick Start Guide](QUICKSTART.md)
 - [Project Summary](PROJECT_SUMMARY.md)
-- [Video Script](VIDEO_SCRIPT.md)
+- [3-Minute Video Script](VIDEO_SCRIPT.md)
 
 ## 📄 License
 
@@ -403,16 +433,18 @@ MIT License
 ## 🙏 Acknowledgments
 
 Built upon research from:
+- H.F.R.I. Grant No. 26237 (EduGenZ — ASTE VR [`https://aste.iliachry.gr`](https://aste.iliachry.gr))
 - Meta AI (SAM 2, 3D Gaussian Splatting)
 - University of Zaragoza (ORB-SLAM3)
 - OpenAI (CLIP)
 - Khronos Group (OpenXR)
 - Poetics VR Platform
 
-## 🔗 Repository
+## 🔗 Verified Live Links
 
-- GitHub: [https://github.com/iliachry/neurosymbolic-xr](https://github.com/iliachry/neurosymbolic-xr)
+- GitHub Repository: [https://github.com/iliachry/neurosymbolic-xr](https://github.com/iliachry/neurosymbolic-xr)
+- Live WebXR Serious Game: [https://aste.iliachry.gr](https://aste.iliachry.gr)
 
 ---
 
-**Status**: Active Development | **Version**: 0.1.0 | **Last Updated**: 2026-10-17
+**Status**: Active Development | **Version**: 0.2.0 | **Last Updated**: 2026-10-17

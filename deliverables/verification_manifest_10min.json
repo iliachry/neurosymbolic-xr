@@ -1,0 +1,27 @@
+{
+  "duration_seconds": 600.0,
+  "output_fps": 24,
+  "total_output_frames": 14400,
+  "master": {
+    "path": "deliverables/neurosymbolic_xr_10min_showcase.mp4",
+    "bytes": 47078586,
+    "mib": 44.9,
+    "sha256": "e89e94a7e5c48891661171c18d67977f0b534e5f083605a3c8bee576c49c719c"
+  },
+  "compressed": {
+    "path": "deliverables/neurosymbolic_xr_10min_compressed.mp4",
+    "bytes": 17482222,
+    "mib": 16.67,
+    "sha256": "ce09aafab08477ec0dee007480b1e7330bc85a318de9c1e71e9540ae596a60a0",
+    "strictly_below_20_mb_decimal": true
+  },
+  "verified_urls": [
+    "https://github.com/iliachry/neurosymbolic-xr",
+    "https://aste.iliachry.gr",
+    "https://doi.org/10.1016/j.procs.2015.03.050",
+    "https://doi.org/10.1002/inst.12159",
+    "https://doi.org/10.1016/j.cexr.2026.100155",
+    "https://doi.org/10.1109/MIOT.2026.3680843",
+    "https://doi.org/10.1007/s00006-022-01253-9"
+  ]
+}

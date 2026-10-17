@@ -24,3 +24,7 @@ video_production/audio/*.wav
 .vscode/
 *.swp
 *.swo
+
+video_production/audio_10min/
+video_production/aste_frames/*.jpg
+video_production/aste_frames/*.png

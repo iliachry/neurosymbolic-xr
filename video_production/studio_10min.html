@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Neurosymbolic XR × ASTE VR — 10-Minute Technical Showcase Studio</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #050914;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #f8fafc;
+  }
+  canvas {
+    display: block;
+    width: 1920px;
+    height: 1080px;
+  }
+</style>
+</head>
+<body>
+<canvas id="stage" width="1920" height="1080"></canvas>
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const W = 1920, H = 1080;
+
+// Preload all 176 ASTE 1080p WebGL frames + extra screenshots
+const SHOTS = ['intro', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10'];
+const FRAMES_PER_SHOT = 16;
+const imageCache = {};
+let loadedCount = 0;
+let totalToLoad = 0;
+window.assetsReady = false;
+
+function queueImage(key, src) {
+  totalToLoad++;
+  const img = new Image();
+  img.onload = () => {
+    imageCache[key] = img;
+    loadedCount++;
+    if (loadedCount >= totalToLoad) window.assetsReady = true;
+  };
+  img.onerror = () => {
+    loadedCount++;
+    if (loadedCount >= totalToLoad) window.assetsReady = true;
+  };
+  img.src = src;
+}
+
+for (const s of SHOTS) {
+  for (let k = 0; k < FRAMES_PER_SHOT; k++) {
+    const kk = String(k).padStart(2, '0');
+    queueImage(`${s}_${kk}`, `aste_frames/${s}_${kk}.jpg`);
+  }
+}
+queueImage('cockpit', 'aste_frames/educator_cockpit_live.png');
+queueImage('quest_live', 'aste_frames/quest_live_screencap.png');
+queueImage('aste_arch', 'aste_frames/ASTEArchitecture.png');
+queueImage('r10_dash', 'aste_frames/Room10-Dashboard.png');
+queueImage('storyboard', 'aste_frames/StoryboardAsAWhole.png');
+
+// 20-Scene Specification (600.0s total)
+const SCENES = [
+  { id: 1, start: 0, end: 25, key: 'cold_open', title: 'Neurosymbolic XR × ASTE VR', subtitle: 'Formal Symbolic Verification Meets Embodied 6DoF Systems Thinking', shot: 'r1' },
+  { id: 2, start: 25, end: 50, key: 'evidence_contract', title: 'Formal Neurosymbolic Evidence Contract', subtitle: 'Three-Valued Truth (TRUE | FALSE | UNKNOWN) & Explicit Provenance', shot: 'intro' },
+  { id: 3, start: 50, end: 80, key: 'spatial_and_slam', title: 'Systems 1 & 2: Spatial Reasoning & Hybrid SLAM', subtitle: '3DGS + SAM 2 + CLIP → RDF/OWL Scene Graph + ORB-SLAM3 Loop Closure', shot: 'r1' },
+  { id: 4, start: 80, end: 110, key: 'training_and_z3', title: 'Systems 3 & 4: Prolog Assistant & Z3 Asset Generator', subtitle: 'Temporal Action Verification, ErrorDiagnoser & SMT Geometric Proofs', shot: 'r2' },
+  { id: 5, start: 110, end: 135, key: 'aste_constellation', title: 'Enter ASTE VR (aste.iliachry.gr)', subtitle: 'Macrocosm Curriculum Constellation · 10 Escape Chambers · Arnold & Wade (2015, 2017)', shot: 'intro' },
+  { id: 6, start: 135, end: 170, key: 'room_1', room: 1, title: 'Room 1: Forgotten Boundary', subtitle: 'Skills 2.1–2.2 · Recognize Systems & Maintain Boundaries', shot: 'r1' },
+  { id: 7, start: 170, end: 205, key: 'room_2', room: 2, title: 'Room 2: Hall of Scale & Quantity', subtitle: 'Skill 2.3 · Differentiate & Quantify Elements (Dimensional Homogeneity)', shot: 'r2' },
+  { id: 8, start: 205, end: 240, key: 'room_3', room: 3, title: 'Room 3: River of Relationships', subtitle: 'Skills 3.1–3.2 · Signed Causal Graph & Mediator Mechanism', shot: 'r3' },
+  { id: 9, start: 240, end: 275, key: 'room_4', room: 4, title: 'Room 4: Echo Forest (Feedback & Delays)', subtitle: 'Skills 3.3–3.4 · Loop Polarity P(C) = ∏ sign(e) & Phase Delay Lag τ', shot: 'r4' },
+  { id: 10, start: 275, end: 310, key: 'room_5', room: 5, title: 'Room 5: Valley of Time (Stocks & Flows)', subtitle: 'Skills 4.1–4.3 · Conservation S(k+1) = S(k) + Δt(q_in - q_out) & Chronos Lens', shot: 'r5' },
+  { id: 11, start: 310, end: 345, key: 'room_6', room: 6, title: 'Room 6: Prism Mountain (Perspectives)', subtitle: 'Skill 1.1 · Multi-Stakeholder Lens Verification (Pupil · Teacher · Designer)', shot: 'r6' },
+  { id: 12, start: 345, end: 380, key: 'room_7', room: 7, title: 'Room 7: Garden of Models', subtitle: 'Skill 1.5 · Mental Model Adequacy L(M) = Error(M) + λ·Complexity(M)', shot: 'r7' },
+  { id: 13, start: 380, end: 415, key: 'room_8', room: 8, title: 'Room 8: Seed of Change (Leverage Points)', subtitle: 'Skill 4.4 · Structural Feedback Optimization vs Symptomatic Buffers', shot: 'r8' },
+  { id: 14, start: 415, end: 450, key: 'room_9', room: 9, title: 'Room 9: Emergence Chamber', subtitle: 'Skills 1.1–4.4 Transfer · Coupled Urban-Water Network & Macro Stability', shot: 'r9' },
+  { id: 15, start: 450, end: 485, key: 'room_10', room: 10, title: 'Room 10: Reflection Observatory', subtitle: 'Metacognitive Synthesis · Evidence Provenance vs Psychometric Certification', shot: 'r10' },
+  { id: 16, start: 485, end: 515, key: 'garmin_biometrics', title: 'Garmin BLE Wrist Watch & Biometric Provenance', subtitle: 'Explicit LIVE | SIMULATED | STALE | UNAVAILABLE States & Adjacent-Beat RMSSD', shot: 'r4' },
+  { id: 17, start: 515, end: 545, key: 'astra_and_cockpit', title: 'Symbolically Gated Astra & Educator Cockpit', subtitle: 'Entity Grounding + Non-Leakage Gate + Per-Session Poetics Isolation', shot: 'r10' },
+  { id: 18, start: 545, end: 575, key: 'tests_and_roadmap', title: 'Counterexample Tests, Benchmarks & 5-Phase Roadmap', subtitle: '13/13 Unit Tests Passing · Sub-2ms Symbolic Verifier · 20-Week Continuation Plan', shot: 'r8' },
+  { id: 19, start: 575, end: 590, key: 'verified_references', title: 'Verified Primary Literature & Live URL Manifest', subtitle: 'Zero Fabricated Links · Resolved DOIs & Public Repositories', shot: 'intro' },
+  { id: 20, start: 590, end: 600, key: 'closing_card', title: 'Neurosymbolic XR × ASTE VR', subtitle: 'https://github.com/iliachry/neurosymbolic-xr · https://aste.iliachry.gr', shot: 'intro' }
+];
+
+const ROOM_CONTRACTS = {
+  1: {
+    name: 'Forgotten Boundary',
+    skills: 'Skills 2.1–2.2 · Recognize Systems & Maintain Boundaries',
+    formula: 'I(B) = (|R ∩ B| + |N ∩ Bᶜ|) / (|R| + |N|) ≥ 0.70  ∧  |S − 70| ≤ 4  ∧  |q_in − q_out| ≤ 0.5',
+    entities: ['Interactable_BoundaryRing', 'Interactable_PrimaryLever', 'reservoir', 'soil_moisture', 'garden_bed'],
+    counterexample: {
+      action: 'Radius set to 2.2m (excludes soil_moisture & garden_bed, includes distant_bell)',
+      verdict: 'FALSE',
+      violated: ['boundary_integrity_below_threshold(0.33 < 0.70)'],
+      detail: 'Reservoir filled to 70.0 units, but conceptual boundary omits essential system stocks.'
+    },
+    mastery: {
+      action: 'Vernier Handwheel rotated to 3.2m; Inflow Lever matched to 6.0 u/s outflow',
+      verdict: 'TRUE',
+      metric: 'I(B) = 1.00 (100% Integrity) · Stock = 70.0 ± 0.0 · Dwell = 3.0s',
+      proof: 'ValidEvidence_1 ∧ TaskConstraints_1 ∧ RequiredTrace_1'
+    },
+    astra: 'What changes if soil moisture is left outside your system boundary?',
+    gateStatus: 'grounded_on(boundary)_and_non_leaking'
+  },
+  2: {
+    name: 'Hall of Scale & Quantity',
+    skills: 'Skill 2.3 · Differentiate & Quantify Elements',
+    formula: 'Comparable(q₁, q₂) ⇒ SameQuantityKind(q₁, q₂) ∧ CompatibleUnits(q₁, q₂)',
+    entities: ['Interactable_Cube_Count', 'Interactable_RejectComparison', 'count(10)', 'length(10m)', 'time(10s)'],
+    counterexample: {
+      action: 'Accepted direct comparison between 24 cm² (area) and 20 cm (length)',
+      verdict: 'FALSE',
+      violated: ['accepted_incompatible_comparison(24_cm2_vs_20_cm)'],
+      detail: 'Dimensional homogeneity violated: L² (area) cannot be ordered against L¹ (length).'
+    },
+    mastery: {
+      action: 'Classified Count(10), Length(10m), Time(10s) & engaged Reject Comparison Plunger',
+      verdict: 'TRUE',
+      metric: '3/3 Quantity Kinds Classified · Incompatible Comparison Rejected',
+      proof: 'DimensionalHomogeneity(OK) ∧ Note: 120-pt game score != physical conservation'
+    },
+    astra: 'What physical quantity kind does each numeral "10" actually measure?',
+    gateStatus: 'grounded_on(quantity)_and_non_leaking'
+  },
+  3: {
+    name: 'River of Relationships',
+    skills: 'Skills 3.1–3.2 · Identify & Characterize Relationships',
+    formula: 'sign(x → y) = sign(∂f_y / ∂x)  ∧  Path(Valve →⁺¹ Mediator →⁺¹ Inflow →⁺¹ Stock)  ∧  (Outflow →⁻¹ Stock)',
+    entities: ['Valve', 'Mediator', 'Inflow', 'Outflow', 'Stock'],
+    counterexample: {
+      action: 'Assigned positive (+1) polarity to Outflow → Stock and omitted Mediator node',
+      verdict: 'FALSE',
+      violated: ['invalid_edge_polarity(Outflow->Stock, expected=-1)', 'missing_pre_pulse_prediction_trace'],
+      detail: 'Jacobian ∂(dStock/dt)/∂Outflow = −1; positive edge assertion contradicts mass balance.'
+    },
+    mastery: {
+      action: 'Inserted Mediator node, set Outflow → Stock (−1), recorded pre-pulse prediction',
+      verdict: 'TRUE',
+      metric: '4/4 Signed Causal Edges Verified · Pre-Pulse Prediction Logged',
+      proof: 'SignedJacobianMatch(4/4) ∧ PredictionPrecedesObservation(TRUE)'
+    },
+    astra: 'If outflow increases while inflow stays fixed, what happens to the stock?',
+    gateStatus: 'grounded_on(inflow)_and_non_leaking'
+  },
+  4: {
+    name: 'Echo Forest: Feedback & Delays',
+    skills: 'Skills 3.3–3.4 · Identify & Characterize Feedback Loops & Delays',
+    formula: 'P(C) = ∏_{e ∈ C} sign(e) ∈ {+1 (Reinforcing), −1 (Balancing)}  ∧  t_wait ≥ τ_delay',
+    entities: ['Interactable_DelayDial', 'Interactable_DampingWard', 'feedback', 'loop', 'delay', 'lag'],
+    counterexample: {
+      action: 'Re-adjusted valve at t_wait = 1.5s before τ_delay = 4.0s nutrient propagation',
+      verdict: 'FALSE',
+      violated: ['premature_intervention_before_delay_lag(1.5s < 4.0s)'],
+      detail: 'Acting inside phase lag τ induces policy-driven overshoot oscillation.'
+    },
+    mastery: {
+      action: 'Classified P(C) = (+1)(+1)(−1) = −1 (Balancing) & observed across full 4.5s lag',
+      verdict: 'TRUE',
+      metric: 'Loop Polarity P(C) = −1 Verified · Delay Horizon 4.5s ≥ 4.0s Satisfied',
+      proof: 'CyclePolarity(Balancing) ∧ LagDwell(4.5s) · Continuous stability verified'
+    },
+    astra: 'Has your previous intervention had time to propagate across the delay lag?',
+    gateStatus: 'grounded_on(delay)_and_non_leaking'
+  },
+  5: {
+    name: 'Valley of Time: Stocks & Flows',
+    skills: 'Skills 4.1–4.3 · Past Behavior, Prediction & Response to Change',
+    formula: 'S_{k+1} = S_k + Δt · (∑ q_{in,k} − ∑ q_{out,k})  ∧  t_predict < t_reveal',
+    entities: ['Interactable_ChronosLens', 'reservoir', 'inflow', 'outflow', 'stock', 'trajectory'],
+    counterexample: {
+      action: 'Submitted non-conserving trajectory [70, 80, 85, 88, 90] under constant net flow +5 u/s',
+      verdict: 'FALSE',
+      violated: ['mass_conservation_residual_exceeded(5.000)'],
+      detail: 'With q_in=10, q_out=5, Δt=1, conservation requires ΔS = +5 per step ([70, 75, 80, 85, 90]).'
+    },
+    mastery: {
+      action: 'Predicted [70, 75, 80, 85, 90] via Chronos Lens prior to trajectory reveal',
+      verdict: 'TRUE',
+      metric: 'Terminal Stock = 90.0 u · Max Conservation Residual = 0.0000 u',
+      proof: 'MassConservation(Residual ≤ 0.01) ∧ PreRevealPrediction(TRUE)'
+    },
+    astra: 'Does equal inflow and outflow mean the reservoir is empty, or simply constant?',
+    gateStatus: 'grounded_on(inflow)_and_non_leaking'
+  },
+  6: {
+    name: 'Prism Mountain: Perspectives',
+    skills: 'Skill 1.1 · Consider Multiple Perspectives',
+    formula: '∀p ∈ {Pupil, Teacher, Designer}: SupportedConcern(p)  ∧  JustifiedTradeoff(p₁, p₂)',
+    entities: ['Interactable_PerspectivePrism', 'pupil', 'teacher', 'designer', 'stakeholder', 'policy'],
+    counterexample: {
+      action: 'Rapidly clicked through all 3 optical lenses without articulating stakeholder trade-offs',
+      verdict: 'FALSE',
+      violated: ['missing_stakeholder_perspectives([Designer, Teacher])', 'missing_justified_stakeholder_tradeoff'],
+      detail: 'Mechanical UI lens cycling does not establish multi-perspective reasoning.'
+    },
+    mastery: {
+      action: 'Documented Pupil, Teacher & Designer concerns + justified curriculum-vs-pacing trade-off',
+      verdict: 'TRUE',
+      metric: '3/3 Stakeholder Lenses Articulated · Explicit Trade-off Verified',
+      proof: 'StakeholderCoverage(3/3) ∧ NonTrivialTradeoffJustification(TRUE)'
+    },
+    astra: 'Who benefits from this system policy, and which stakeholder bears its cost?',
+    gateStatus: 'grounded_on(policy)_and_non_leaking'
+  },
+  7: {
+    name: 'Garden of Models',
+    skills: 'Skill 1.5 · Use Mental Models & Abstraction',
+    formula: 'L(M) = Error_held_out(M) + λ·Complexity(M) ≤ 0.35  ∧  EssentialVars ⊆ M  ∧  (NoiseVars ∩ M = ∅)',
+    entities: ['Interactable_ModelSeedKit', 'model', 'branch', 'variable', 'explanatory', 'abstraction'],
+    counterexample: {
+      action: 'Pruned essential soil_absorption branch while retaining spurious cloud_color variable',
+      verdict: 'FALSE',
+      violated: ['pruned_causally_essential_variable', 'retained_spurious_noise_variable'],
+      detail: 'Over-pruning causal mechanisms degrades held-out generalization under perturbation.'
+    },
+    mastery: {
+      action: 'Retained {inflow, outflow, soil_absorption}, pruned {cloud_color, ambient_chime}',
+      verdict: 'TRUE',
+      metric: 'Held-Out Error = 0.06 · Model Loss L(M) = 0.210 · Score = 79.0%',
+      proof: 'EssentialPreserved(TRUE) ∧ NoisePruned(TRUE) ∧ RevisedAfterCounterexample(TRUE)'
+    },
+    astra: 'Which causal branch can you prune without losing held-out explanatory power?',
+    gateStatus: 'grounded_on(branch)_and_non_leaking'
+  },
+  8: {
+    name: 'Seed of Change: Leverage Points',
+    skills: 'Skill 4.4 · Use Leverage Points to Produce Desired Effects',
+    formula: 'a* = argmax_{a ∈ A_feasible} [ J(x^{do(a)}_{0:H}) − λ·Cost(a) ]  ∧  StructuralRule(a*)',
+    entities: ['Interactable_LeverageSeed', 'intervention', 'leverage', 'feedback', 'structure', 'symptom'],
+    counterexample: {
+      action: 'Selected low-leverage symptom_buffer (J=25, Cost=10) instead of feedback_gain_rule',
+      verdict: 'FALSE',
+      violated: ['suboptimal_leverage_point(selected=symptom_buffer, optimal=feedback_gain_rule)', 'selected_symptomatic_parameter_instead_of_structural_rule'],
+      detail: 'Parameter buffering leaves runaway feedback structure intact over horizon H.'
+    },
+    mastery: {
+      action: 'Engaged structural feedback_gain_rule (J=92.0, Cost=15.0, Net Utility=84.5)',
+      verdict: 'TRUE',
+      metric: 'Normalized Utility = 100.0% (Optimal Structural Intervention Selected)',
+      proof: 'ArgMaxHorizonUtility(feedback_gain_rule) ∧ StructuralModification(TRUE)'
+    },
+    astra: 'Does this intervention alter the system\'s feedback structure or only today\'s symptom?',
+    gateStatus: 'grounded_on(feedback)_and_non_leaking'
+  },
+  9: {
+    name: 'Emergence Chamber',
+    skills: 'Skills 1.1–4.4 · Integrated Multi-District Transfer Task',
+    formula: '∑_i u_i ≤ C_max (100 u)  ∧  MacroGiniStability(h(x_t)) ≥ 0.80  ∧  AblationCompared',
+    entities: ['Interactable_DistrictConsole', 'district', 'water', 'aquifer', 'macro', 'allocation'],
+    counterexample: {
+      action: 'Uncoordinated local district withdrawals [45, 45, 45] → 135 u > 100 u aquifer capacity',
+      verdict: 'FALSE',
+      violated: ['aquifer_overdraft(135.0 > 100.0)', 'emergent_macro_instability(0.42 < 0.80)'],
+      detail: 'Locally rational district maximization triggers Tragedy-of-the-Commons aquifer collapse.'
+    },
+    mastery: {
+      action: 'Coordinated allocation [30, 32, 33] = 95.0/100.0 u · Compared against greedy ablation',
+      verdict: 'TRUE',
+      metric: 'Total Extraction = 95.0/100.0 u · Macro Gini Stability = 0.88 (88.0%)',
+      proof: 'AquiferConservation(TRUE) ∧ MacroStability(0.88 ≥ 0.80) ∧ AblationTrace(TRUE)'
+    },
+    astra: 'Why did locally sensible district actions produce an undesirable macro water shortage?',
+    gateStatus: 'grounded_on(district)_and_non_leaking'
+  },
+  10: {
+    name: 'Reflection Observatory',
+    skills: 'Metacognitive Consolidation & Educator Cockpit Provenance',
+    formula: 'AcceptedClaim(c) ⇒ ∃E ⊆ E_valid : Supports(E, c) ∧ ValidProvenance(E) ∧ RevisedBelief',
+    entities: ['Interactable_ObservatoryConsole', 'observation', 'model', 'evidence', 'claim', 'revision'],
+    counterexample: {
+      action: 'Submitted reflection claim citing unlogged event ID [fabricated_event_id]',
+      verdict: 'FALSE',
+      violated: ['unsubstantiated_claim(claim_1)'],
+      detail: 'Every dashboard conclusion must trace to cryptographically logged session events.'
+    },
+    mastery: {
+      action: 'Linked claim_1 → [ev_r1_boundary, ev_r4_delay] & logged disconfirming belief revision',
+      verdict: 'TRUE',
+      metric: '100% Claims Backed by Session Evidence · Qualification Preserved',
+      proof: 'CitedEvents([ev_r1_boundary, ev_r4_delay]) · Completion != Psychometric Score'
+    },
+    astra: 'Which specific disconfirming observation caused you to revise your mental model?',
+    gateStatus: 'grounded_on(model)_and_non_leaking'
+  }
+};
+
+function roundRect(x, y, w, h, r, fill, stroke, lineWidth = 1.5) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
+}
+
+function drawPill(x, y, text, bg, fg, border = null, fontSize = 13) {
+  ctx.font = `700 ${fontSize}px "JetBrains Mono", "SF Mono", monospace`;
+  const padX = 12;
+  const tw = ctx.measureText(text).width;
+  const pw = tw + padX * 2;
+  const ph = fontSize + 12;
+  roundRect(x, y, pw, ph, 6, bg, border, 1);
+  ctx.fillStyle = fg;
+  ctx.fillText(text, x + padX, y + fontSize + 2);
+  return pw;
+}
+
+function wrapText(text, x, y, maxWidth, lineHeight, color = '#e2e8f0', font = '500 16px Inter, sans-serif') {
+  ctx.font = font;
+  ctx.fillStyle = color;
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  for (let i = 0; i < words.length; i++) {
+    const test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > maxWidth && i > 0) {
+      ctx.fillText(line.trim(), x, curY);
+      line = words[i] + ' ';
+      curY += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  if (line.trim()) {
+    ctx.fillText(line.trim(), x, curY);
+    curY += lineHeight;
+  }
+  return curY;
+}
+
+function drawShotFrame(shotId, localProgress, x, y, w, h, radius = 14) {
+  const fFloat = Math.max(0, Math.min(FRAMES_PER_SHOT - 1.001, localProgress * (FRAMES_PER_SHOT - 1)));
+  const idx0 = Math.floor(fFloat);
+  const idx1 = Math.min(FRAMES_PER_SHOT - 1, idx0 + 1);
+  const alpha = fFloat - idx0;
+
+  const k0 = `${shotId}_${String(idx0).padStart(2, '0')}`;
+  const k1 = `${shotId}_${String(idx1).padStart(2, '0')}`;
+  const img0 = imageCache[k0];
+  const img1 = imageCache[k1];
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, radius);
+  ctx.clip();
+
+  if (img0) {
+    ctx.drawImage(img0, x, y, w, h);
+  } else {
+    ctx.fillStyle = '#0a1324';
+    ctx.fillRect(x, y, w, h);
+  }
+  if (img1 && idx1 !== idx0 && alpha > 0.01) {
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(img1, x, y, w, h);
+    ctx.globalAlpha = 1.0;
+  }
+  ctx.restore();
+  roundRect(x, y, w, h, radius, null, 'rgba(0, 210, 255, 0.45)', 2);
+}
+
+function drawTopBar(t, scene) {
+  roundRect(24, 18, W - 48, 66, 12, 'rgba(8, 15, 30, 0.92)', 'rgba(56, 189, 248, 0.35)', 1.5);
+
+  let cx = 44;
+  cx += drawPill(cx, 35, `SCENE ${String(scene.id).padStart(2, '0')}/20`, 'rgba(14, 165, 233, 0.2)', '#38bdf8', '#0ea5e9', 13) + 14;
+  if (scene.room) {
+    cx += drawPill(cx, 35, `ASTE ROOM ${String(scene.room).padStart(2, '0')}`, 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 13) + 14;
+  } else {
+    cx += drawPill(cx, 35, 'NEUROSYMBOLIC XR × ASTE VR', 'rgba(139, 92, 246, 0.2)', '#c4b5fd', '#8b5cf6', 13) + 14;
+  }
+
+  ctx.font = '800 22px Inter, sans-serif';
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillText(scene.title, cx, 49);
+
+  ctx.font = '500 13px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(scene.subtitle, cx, 69);
+
+  // Right side clock + verified domains
+  const mins = String(Math.floor(t / 60)).padStart(2, '0');
+  const secs = String(Math.floor(t % 60)).padStart(2, '0');
+  drawPill(W - 395, 35, 'aste.iliachry.gr · LIVE WEBXR', 'rgba(15, 23, 42, 0.9)', '#38bdf8', 'rgba(56, 189, 248, 0.4)', 12);
+  drawPill(W - 165, 35, `${mins}:${secs} / 10:00`, 'rgba(15, 23, 42, 0.95)', '#f8fafc', 'rgba(148, 163, 184, 0.4)', 13);
+}
+
+function drawBottomTimeline(t, scene) {
+  const y = H - 46;
+  roundRect(24, y, W - 48, 30, 8, 'rgba(8, 15, 30, 0.9)', 'rgba(51, 65, 85, 0.6)', 1);
+  const barX = 40, barW = W - 80;
+  const pct = Math.max(0, Math.min(1, t / 600.0));
+  roundRect(barX, y + 11, barW, 8, 4, 'rgba(30, 41, 59, 0.9)', null);
+  roundRect(barX, y + 11, Math.max(8, barW * pct), 8, 4, '#0ea5e9', null);
+
+  for (const s of SCENES) {
+    const sx = barX + (s.start / 600.0) * barW;
+    ctx.fillStyle = t >= s.start ? '#34d399' : '#475569';
+    ctx.fillRect(sx, y + 8, 2, 14);
+  }
+}
+
+function renderRoomDeepDive(t, scene, localP) {
+  const c = ROOM_CONTRACTS[scene.room];
+  // Left viewport: 1180x880 real 1080p 3D WebGL Director Mode capture
+  const vx = 24, vy = 98, vw = 1180, vh = 920;
+  drawShotFrame(scene.shot, localP, vx, vy, vw, vh, 14);
+
+  // Subtle top-left provenance badge over WebGL frame
+  roundRect(vx + 16, vy + 52, 490, 34, 8, 'rgba(4, 9, 20, 0.86)', 'rgba(0, 245, 160, 0.6)', 1.2);
+  ctx.font = '700 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#00f5a0';
+  ctx.fillText(`🎥 DIRECTOR MODE 3D WEBGL CAPTURE · aste.iliachry.gr (ROOM ${String(scene.room).padStart(2, '0')})`, vx + 28, vy + 73);
+
+  // Right Inspector Panel: Formal Neurosymbolic Verifier
+  const rx = 1222, ry = 98, rw = W - rx - 24, rh = 920;
+  roundRect(rx, ry, rw, rh, 14, 'rgba(8, 15, 30, 0.95)', 'rgba(56, 189, 248, 0.4)', 1.5);
+
+  let cy = ry + 24;
+  drawPill(rx + 22, cy, 'ASTENeurosymbolicVerifier · src/integration/aste.py', 'rgba(14, 165, 233, 0.15)', '#38bdf8', '#0284c7', 12);
+  cy += 42;
+
+  ctx.font = '800 22px Inter, sans-serif';
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillText(`Room ${scene.room}: ${c.name}`, rx + 22, cy);
+  cy += 24;
+  ctx.font = '600 13px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#34d399';
+  ctx.fillText(c.skills, rx + 22, cy);
+  cy += 20;
+
+  // Box 1: Formal Invariant Formula
+  roundRect(rx + 18, cy, rw - 36, 92, 10, 'rgba(15, 23, 42, 0.95)', 'rgba(139, 92, 246, 0.45)', 1.2);
+  ctx.font = '700 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#c4b5fd';
+  ctx.fillText('FORMAL SYMBOLIC INVARIANT & COMPLETION RULE', rx + 32, cy + 22);
+  wrapText(c.formula, rx + 32, cy + 46, rw - 64, 21, '#f8fafc', '600 14px "JetBrains Mono", monospace');
+  cy += 106;
+
+  // Box 2: Grounded Scene-Graph Entities
+  roundRect(rx + 18, cy, rw - 36, 86, 10, 'rgba(15, 23, 42, 0.95)', 'rgba(56, 189, 248, 0.35)', 1.2);
+  ctx.font = '700 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText('GROUNDED SCENE-GRAPH ENTITIES (GroundedFact · source="webxr_engine")', rx + 32, cy + 22);
+  let ex = rx + 32;
+  for (const ent of c.entities) {
+    const pw = drawPill(ex, cy + 36, ent, 'rgba(2, 132, 199, 0.2)', '#bae6fd', 'rgba(56, 189, 248, 0.4)', 11);
+    ex += pw + 8;
+    if (ex > rx + rw - 130) break;
+  }
+  cy += 100;
+
+  // Phase highlight: first half emphasizes Counterexample rejection, second half Mastery verification
+  const isMasteryPhase = localP >= 0.45;
+
+  // Box 3: Negative Counterexample Test (Rejected by Verifier)
+  const ceBorder = !isMasteryPhase ? '#f43f5e' : 'rgba(244, 63, 94, 0.35)';
+  const ceBg = !isMasteryPhase ? 'rgba(69, 10, 26, 0.55)' : 'rgba(15, 23, 42, 0.85)';
+  roundRect(rx + 18, cy, rw - 36, 195, 10, ceBg, ceBorder, !isMasteryPhase ? 2.2 : 1.2);
+  drawPill(rx + 32, cy + 14, 'NEGATIVE COUNTEREXAMPLE TEST', 'rgba(244, 63, 94, 0.2)', '#fda4af', '#f43f5e', 11);
+  drawPill(rx + rw - 205, cy + 14, 'TruthValue: FALSE', 'rgba(244, 63, 94, 0.3)', '#fecdd3', '#f43f5e', 11);
+  let ty = wrapText(`Trace: ${c.counterexample.action}`, rx + 32, cy + 56, rw - 64, 20, '#f8fafc', '600 14px Inter, sans-serif');
+  ty = wrapText(`Violated: ${c.counterexample.violated.join(' · ')}`, rx + 32, ty + 4, rw - 64, 19, '#fda4af', '600 13px "JetBrains Mono", monospace');
+  wrapText(c.counterexample.detail, rx + 32, ty + 4, rw - 64, 19, '#cbd5e1', '400 13px Inter, sans-serif');
+  cy += 210;
+
+  // Box 4: Verified Mastery Trace (Accepted by Verifier)
+  const maBorder = isMasteryPhase ? '#10b981' : 'rgba(16, 185, 129, 0.35)';
+  const maBg = isMasteryPhase ? 'rgba(6, 48, 35, 0.6)' : 'rgba(15, 23, 42, 0.85)';
+  roundRect(rx + 18, cy, rw - 36, 190, 10, maBg, maBorder, isMasteryPhase ? 2.2 : 1.2);
+  drawPill(rx + 32, cy + 14, 'VERIFIED MASTERY TRACE', 'rgba(16, 185, 129, 0.25)', '#6ee7b7', '#10b981', 11);
+  drawPill(rx + rw - 200, cy + 14, 'TruthValue: TRUE', 'rgba(16, 185, 129, 0.3)', '#d1fae5', '#10b981', 11);
+  let my = wrapText(`Action: ${c.mastery.action}`, rx + 32, cy + 56, rw - 64, 20, '#f8fafc', '600 14px Inter, sans-serif');
+  my = wrapText(`Metric: ${c.mastery.metric}`, rx + 32, my + 4, rw - 64, 19, '#6ee7b7', '600 13px "JetBrains Mono", monospace');
+  wrapText(`Proof: ${c.mastery.proof}`, rx + 32, my + 4, rw - 64, 19, '#cbd5e1', '500 13px "JetBrains Mono", monospace');
+  cy += 205;
+
+  // Box 5: Symbolically Gated Astra Socratic Prompt
+  roundRect(rx + 18, cy, rw - 36, 130, 10, 'rgba(15, 23, 42, 0.95)', 'rgba(56, 189, 248, 0.5)', 1.5);
+  drawPill(rx + 32, cy + 14, 'ASTRA SOCRATIC HINT GATE', 'rgba(14, 165, 233, 0.2)', '#7dd3fc', '#0ea5e9', 11);
+  drawPill(rx + 255, cy + 14, `✔ ${c.gateStatus}`, 'rgba(16, 185, 129, 0.2)', '#6ee7b7', '#10b981', 11);
+  wrapText(`Astra: "${c.astra}"`, rx + 32, cy + 58, rw - 64, 22, '#f8fafc', '600 15px Inter, sans-serif');
+  ctx.font = '500 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText('Gate checks: [1] Entity Grounded  [2] Zero Solution Leakage  [3] Ends with "?"', rx + 32, cy + 112);
+}
+
+function renderScene(t, scene, localP) {
+  if (scene.room) {
+    renderRoomDeepDive(t, scene, localP);
+    return;
+  }
+
+  switch (scene.key) {
+    case 'cold_open': {
+      // Left: Live ASTE VR 1080p frame; Right: Integrated Architecture Overview
+      drawShotFrame('r1', localP, 24, 98, 1080, 920, 14);
+      const rx = 1124, ry = 98, rw = W - rx - 24, rh = 920;
+      roundRect(rx, ry, rw, rh, 14, 'rgba(8, 15, 30, 0.95)', 'rgba(56, 189, 248, 0.45)', 1.5);
+      let cy = ry + 32;
+      drawPill(rx + 28, cy, 'H.F.R.I. GRANT NO. 26237 · EDUGENZ', 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 13);
+      cy += 52;
+      ctx.font = '800 34px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Neurosymbolic XR', rx + 28, cy);
+      cy += 42;
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('× ASTE VR Showcase', rx + 28, cy);
+      cy += 38;
+      cy = wrapText(
+        'Uniting neural spatial perception (3DGS, SAM 2, CLIP) and formal symbolic reasoning (RDF/OWL, SWI-Prolog, Z3 SMT Solver) with 10 embodied 6DoF WebXR escape chambers operationalizing the Arnold & Wade (2015, 2017) systems thinking taxonomy.',
+        rx + 28, cy, rw - 56, 26, '#cbd5e1', '400 17px Inter, sans-serif'
+      );
+      cy += 22;
+      const cards = [
+        ['10 Escape Chambers (Rooms 1–10)', 'Formal symbolic verifiers & negative counterexample tests for every chamber (`src/integration/aste.py`).', '#38bdf8'],
+        ['Garmin BLE Virtual Wrist Watch', 'Explicit `live`, `simulated`, `stale`, and `unavailable` provenance + strict adjacent-beat RMSSD.', '#34d399'],
+        ['Symbolically Gated Astra AI', 'Every Socratic question verified for scene-graph entity grounding and zero solution leakage.', '#c4b5fd'],
+        ['Verified Open-Source & Live Links', 'https://github.com/iliachry/neurosymbolic-xr · https://aste.iliachry.gr', '#fbbf24']
+      ];
+      for (const [title, desc, col] of cards) {
+        roundRect(rx + 24, cy, rw - 48, 112, 10, 'rgba(15, 23, 42, 0.9)', col, 1.5);
+        ctx.font = '700 17px Inter, sans-serif';
+        ctx.fillStyle = col;
+        ctx.fillText(title, rx + 42, cy + 30);
+        wrapText(desc, rx + 42, cy + 56, rw - 84, 21, '#e2e8f0', '400 14px Inter, sans-serif');
+        cy += 126;
+      }
+      break;
+    }
+
+    case 'evidence_contract': {
+      roundRect(24, 98, W - 48, 920, 14, 'rgba(8, 15, 30, 0.95)', 'rgba(56, 189, 248, 0.4)', 1.5);
+      ctx.font = '800 30px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Shared Neurosymbolic Grounding & Verification Contract', 56, 152);
+      ctx.font = '600 18px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('(o_t, e_t)  ──G_θ──▶  F_t (GroundedFact)  ──R_r, C_r──▶  (Decision, Proof)  ──π_r──▶  Room / Astra Response', 56, 192);
+
+      const stages = [
+        { title: '1. Multimodal Input (o_t, e_t)', sub: 'Engine Events + Sensors', items: ['Authoritative WebXR interaction events (e_t)', '6DoF head/hand poses & ODE stock-flow states', 'Garmin BLE HRS (0x180D) & RR intervals', 'Physical LBVR 3DGS + SAM 2 + CLIP observations'], col: '#38bdf8' },
+        { title: '2. Typed Grounding (F_t)', sub: 'GroundedFact Assertions', items: ['session_id, room_id, event_id, entity_id', 'predicate, value, physical unit (m, cm², s, u/s)', 'observed_at, valid_until freshness window', 'Explicit source: webxr_engine | garmin_ble | neural'], col: '#a855f7' },
+        { title: '3. Symbolic Verifier (R_r, C_r)', sub: 'Three-Valued Truth Logic', items: ['Complete_r = ValidEvidence_r ∧ Constraints_r ∧ Trace_r', 'TruthValue.TRUE: All invariants & trace satisfied', 'TruthValue.FALSE: Counterexample rule violation', 'TruthValue.UNKNOWN: Stale or incomplete evidence'], col: '#10b981' },
+        { title: '4. Pedagogical Policy (π_r)', sub: 'Gated Socratic Action', items: ['Unseals chamber airlock only on TruthValue.TRUE', 'Routes violated_rules[] to Astra Socratic generator', 'Enforces verify_socratic_hint_gate() before speech', 'Logs provenance to Educator Cockpit & Poetics'], col: '#f59e0b' }
+      ];
+      let sx = 56;
+      for (const st of stages) {
+        roundRect(sx, 230, 435, 390, 12, 'rgba(15, 23, 42, 0.95)', st.col, 1.8);
+        ctx.font = '800 20px Inter, sans-serif';
+        ctx.fillStyle = st.col;
+        ctx.fillText(st.title, sx + 22, 270);
+        ctx.font = '600 13px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText(st.sub, sx + 22, 294);
+        let iy = 335;
+        for (const it of st.items) {
+          iy = wrapText('• ' + it, sx + 22, iy, 390, 22, '#e2e8f0', '500 15px Inter, sans-serif') + 14;
+        }
+        sx += 455;
+      }
+
+      // Bottom comparison: Why Pure Neural Fails vs Formal Neurosymbolic Contract
+      roundRect(56, 650, W - 112, 335, 12, 'rgba(15, 23, 42, 0.95)', 'rgba(148, 163, 184, 0.35)', 1.5);
+      ctx.font = '800 20px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Audit Integrity Principles Enforced Across All 10 Escape Chambers', 84, 690);
+      const rules = [
+        '✔ Engine Events Are Direct Symbolic Evidence: Known Three.js object IDs are ingested directly without replacing deterministic state with visual guesses.',
+        '✔ Pre-Intervention Prediction Trace: Learners must record predictions before revealing trajectories (Room 3, Room 5, Room 7, Room 8).',
+        '✔ Negative Counterexample Rejection: Every room verifier is tested against invalid boundaries, unit mismatches, reversed edges, and lag violations.',
+        '✔ Qualification of Claims: Chamber completion is behavioral trace evidence—never conflated with standalone psychometric competency certification.'
+      ];
+      let ry = 735;
+      for (const r of rules) {
+        ctx.font = '500 16px Inter, sans-serif';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText(r, 84, ry);
+        ry += 44;
+      }
+      break;
+    }
+
+    case 'spatial_and_slam': {
+      roundRect(24, 98, 920, 920, 14, 'rgba(8, 15, 30, 0.95)', '#38bdf8', 1.5);
+      roundRect(968, 98, 928, 920, 14, 'rgba(8, 15, 30, 0.95)', '#10b981', 1.5);
+
+      // Left: System 1 Spatial Reasoning
+      drawPill(52, 126, 'SYSTEM 1 · SPATIAL REASONING ENGINE', 'rgba(14, 165, 233, 0.2)', '#38bdf8', '#0ea5e9', 13);
+      ctx.font = '800 26px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('3DGS + SAM 2 + CLIP → RDF/OWL Scene Graph', 52, 184);
+      const s1Boxes = [
+        ['Neural Capture: 3D Gaussian Splatting', 'Real-time radiance field reconstruction of physical Poetics LBVR venues (mean_xyz, covariance Σ, opacity α, SH coefficients).'],
+        ['Instance Segmentation: SAM 2', 'Promptable multi-view mask propagation isolating interactable props, tables, valves, and safety boundaries.'],
+        ['Open-Vocabulary Grounding: CLIP ViT-B/32', '512-D visual-textual embedding alignment mapping segmented 3D Gaussians to ontology concepts (`GroundingBridge`).'],
+        ['Symbolic Query Layer: RDF/OWL + SPARQL/Prolog', 'Derives spatial predicates (`on_top_of`, `inside_boundary`, `supports`, `near`) for explainable relational queries.']
+      ];
+      let y1 = 220;
+      for (const [bTitle, bDesc] of s1Boxes) {
+        roundRect(52, y1, 864, 130, 10, 'rgba(15, 23, 42, 0.95)', 'rgba(56, 189, 248, 0.35)', 1.2);
+        ctx.font = '700 18px Inter, sans-serif';
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText(bTitle, 74, y1 + 34);
+        wrapText(bDesc, 74, y1 + 64, 820, 22, '#cbd5e1', '400 15px Inter, sans-serif');
+        y1 += 148;
+      }
+      drawShotFrame('r1', localP, 52, 815, 864, 180, 10);
+
+      // Right: System 2 Hybrid Semantic SLAM
+      drawPill(996, 126, 'SYSTEM 2 · HYBRID SEMANTIC SLAM', 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 13);
+      ctx.font = '800 26px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('ORB-SLAM3 Tracking + Semantic Loop Closure', 996, 184);
+      const s2Boxes = [
+        ['6DoF Visual-Inertial Odometry', 'Tracks headset SE(3) pose across physical LBVR arenas while rejecting dynamic moving learner features.'],
+        ['Semantic Object Persistence Graph', 'Maintains permanent object identity across occlusions (`SemanticMap`), anchoring virtual ASTE consoles to physical pods.'],
+        ['Topological + Semantic Loop Closure', 'Matches constellation subgraphs of grounded landmarks to eliminate cumulative drift over multi-room expeditions.'],
+        ['Cross-Session Venue Memory', 'Serializes verified venue maps to disk/Supabase so returning school cohorts resume calibrated play instantly.']
+      ];
+      let y2 = 220;
+      for (const [bTitle, bDesc] of s2Boxes) {
+        roundRect(996, y2, 872, 130, 10, 'rgba(15, 23, 42, 0.95)', 'rgba(16, 185, 129, 0.35)', 1.2);
+        ctx.font = '700 18px Inter, sans-serif';
+        ctx.fillStyle = '#34d399';
+        ctx.fillText(bTitle, 1018, y2 + 34);
+        wrapText(bDesc, 1018, y2 + 64, 825, 22, '#cbd5e1', '400 15px Inter, sans-serif');
+        y2 += 148;
+      }
+      drawShotFrame('r3', localP, 996, 815, 872, 180, 10);
+      break;
+    }
+
+    case 'training_and_z3': {
+      roundRect(24, 98, 920, 920, 14, 'rgba(8, 15, 30, 0.95)', '#a855f7', 1.5);
+      roundRect(968, 98, 928, 920, 14, 'rgba(8, 15, 30, 0.95)', '#f59e0b', 1.5);
+
+      // Left: System 3 VR Training Assistant
+      drawPill(52, 126, 'SYSTEM 3 · PROLOG VR TRAINING ASSISTANT', 'rgba(168, 85, 247, 0.2)', '#c084fc', '#a855f7', 13);
+      ctx.font = '800 26px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('ActionRecognizer + SWI-Prolog ErrorDiagnoser', 52, 184);
+      const prologCode = [
+        '% Formal Procedural & Systems Thinking Prerequisite Rules',
+        'can_execute(Learner, Step) :-',
+        '    prerequisite(Step, PreStep),',
+        '    completed(Learner, PreStep),',
+        '    safety_satisfied(Learner, Step).',
+        '',
+        'diagnose_error(Learner, room_4_delay, premature_intervention) :-',
+        '    intervened_at(Learner, T1),',
+        '    intervened_at(Learner, T2),',
+        '    Delta is T2 - T1, Delta < 4.0.'
+      ];
+      roundRect(52, 215, 864, 300, 10, '#090d16', 'rgba(168, 85, 247, 0.45)', 1.5);
+      let py = 252;
+      for (const line of prologCode) {
+        ctx.font = '600 15px "JetBrains Mono", monospace';
+        ctx.fillStyle = line.startsWith('%') ? '#64748b' : '#e9d5ff';
+        ctx.fillText(line, 76, py);
+        py += 25;
+      }
+      drawShotFrame('r2', localP, 52, 540, 864, 450, 10);
+
+      // Right: System 4 Neural-Symbolic Asset Generator
+      drawPill(996, 126, 'SYSTEM 4 · Z3 SMT + DIFFUSION ASSET GENERATOR', 'rgba(245, 158, 11, 0.2)', '#fbbf24', '#f59e0b', 13);
+      ctx.font = '800 26px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Constraint-Guided 3D Layout & UNSAT Core Proofs', 996, 184);
+      const z3Code = [
+        '# Z3 SMT Geometric & Chaperone Safety Solver',
+        'solver = z3.Solver()',
+        'solver.add(prop_x - prop_w/2 >= chamber_min_x + clearance)',
+        'solver.add(prop_x + prop_w/2 <= chamber_max_x - clearance)',
+        'solver.add(z3.Implies(is_pedestal, prop_z_min == floor_z))',
+        'solver.add(NoOverlap2D(prop_bbox, airlock_corridor_bbox))',
+        '# Verdict: SAT -> Export Validated Transform to Three.js / glTF',
+        '# Verdict: UNSAT -> Extract unsat_core() for Designer Correction'
+      ];
+      roundRect(996, 215, 872, 300, 10, '#090d16', 'rgba(245, 158, 11, 0.45)', 1.5);
+      let zy = 252;
+      for (const line of z3Code) {
+        ctx.font = '600 15px "JetBrains Mono", monospace';
+        ctx.fillStyle = line.startsWith('#') ? '#fbbf24' : '#fde68a';
+        ctx.fillText(line, 1020, zy);
+        zy += 28;
+      }
+      drawShotFrame('r6', localP, 996, 540, 872, 450, 10);
+      break;
+    }
+
+    case 'aste_constellation': {
+      drawShotFrame('intro', localP, 24, 98, 1180, 920, 14);
+      const rx = 1222, ry = 98, rw = W - rx - 24, rh = 920;
+      roundRect(rx, ry, rw, rh, 14, 'rgba(8, 15, 30, 0.95)', '#38bdf8', 1.5);
+      let cy = ry + 32;
+      drawPill(rx + 24, cy, 'MACROCOSM EXPEDITION HUB · aste.iliachry.gr', 'rgba(14, 165, 233, 0.2)', '#38bdf8', '#0ea5e9', 12);
+      cy += 44;
+      ctx.font = '800 24px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('10 Chambers × Arnold & Wade Taxonomy', rx + 24, cy);
+      cy += 26;
+      const roomsList = [
+        ['R01 · Forgotten Boundary', 'Skills 2.1–2.2: Boundary Critique I(B) ≥ 0.70'],
+        ['R02 · Hall of Scale & Quantity', 'Skill 2.3: Dimensional Homogeneity'],
+        ['R03 · River of Relationships', 'Skills 3.1–3.2: Signed Causal Jacobian'],
+        ['R04 · Echo Forest', 'Skills 3.3–3.4: Loop Polarity & Delay Lag τ'],
+        ['R05 · Valley of Time', 'Skills 4.1–4.3: Stock-Flow Conservation'],
+        ['R06 · Prism Mountain', 'Skill 1.1: Multi-Stakeholder Perspectives'],
+        ['R07 · Garden of Models', 'Skill 1.5: Mental Model Pruning L(M)'],
+        ['R08 · Seed of Change', 'Skill 4.4: Structural Leverage Optimization'],
+        ['R09 · Emergence Chamber', 'Skills 1.1–4.4: Urban-Water Network Transfer'],
+        ['R10 · Reflection Observatory', 'Metacognitive Provenance & Educator Cockpit']
+      ];
+      for (const [rTitle, rSub] of roomsList) {
+        roundRect(rx + 22, cy, rw - 44, 68, 8, 'rgba(15, 23, 42, 0.92)', 'rgba(56, 189, 248, 0.3)', 1);
+        ctx.font = '700 15px Inter, sans-serif';
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText(rTitle, rx + 38, cy + 26);
+        ctx.font = '500 13px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText(rSub, rx + 38, cy + 50);
+        cy += 76;
+      }
+      break;
+    }
+
+    case 'garmin_biometrics': {
+      drawShotFrame('r4', localP, 24, 98, 1020, 920, 14);
+      const rx = 1062, ry = 98, rw = W - rx - 24, rh = 920;
+      roundRect(rx, ry, rw, rh, 14, 'rgba(8, 15, 30, 0.95)', '#10b981', 1.5);
+      let cy = ry + 30;
+      drawPill(rx + 24, cy, 'GARMIN BLE HRS (0x180D) · PROVENANCE VERIFIER', 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 12);
+      cy += 46;
+      ctx.font = '800 25px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Four-State Biometric Provenance Contract', rx + 24, cy);
+      cy += 30;
+
+      const states = [
+        ['BiometricProvenance.LIVE', '#10b981', 'Hardware Garmin BLE strap connected via WebSocket bridge; packet age ≤ 5.0s; RMSSD computed from adjacent valid RR intervals (250–2000ms).'],
+        ['BiometricProvenance.SIMULATED', '#38bdf8', 'Explicitly badged as STANDALONE (SIMULATED) on Virtual Wrist Watch when running in browser/Director Mode without hardware strap.'],
+        ['BiometricProvenance.STALE', '#f59e0b', 'Triggered automatically when (current_time − observed_at) > 5.0s or timestamp skew < 0; RMSSD returns None (never extrapolated).'],
+        ['BiometricProvenance.UNAVAILABLE', '#f43f5e', 'Disconnected bridge or missing heart_rate_bpm; suppresses biometric Prolog triggers so missing data never fabricates cognitive load.']
+      ];
+      for (const [stName, col, desc] of states) {
+        roundRect(rx + 24, cy, rw - 48, 118, 10, 'rgba(15, 23, 42, 0.92)', col, 1.5);
+        ctx.font = '700 16px "JetBrains Mono", monospace';
+        ctx.fillStyle = col;
+        ctx.fillText(stName, rx + 40, cy + 30);
+        wrapText(desc, rx + 40, cy + 56, rw - 80, 20, '#e2e8f0', '400 14px Inter, sans-serif');
+        cy += 132;
+      }
+
+      // Adjacent-beat RMSSD verification box
+      roundRect(rx + 24, cy, rw - 48, 220, 10, '#090d16', 'rgba(56, 189, 248, 0.45)', 1.5);
+      ctx.font = '700 15px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('STRICT ADJACENT-BEAT RMSSD (NO DROPPED-BEAT BRIDGING)', rx + 40, cy + 30);
+      const rrLines = [
+        'Input RR stream: [800.0ms, 820.0ms, 3000.0ms (DROPPED), 790.0ms, 810.0ms]',
+        'Pair (800, 820) -> valid adjacent (Δ = +20ms, Δ² = 400)',
+        'Pairs (820, 3000) & (3000, 790) -> REJECTED (3000ms > 2000ms physiological bound)',
+        'Pair (790, 810) -> valid adjacent (Δ = +20ms, Δ² = 400)',
+        'Verified Output: RMSSD = sqrt((400 + 400) / 2) = 20.00 ms  [test_aste_integration.py ✔]'
+      ];
+      let rry = cy + 64;
+      for (const l of rrLines) {
+        ctx.font = '500 13px "JetBrains Mono", monospace';
+        ctx.fillStyle = l.includes('REJECTED') ? '#fda4af' : (l.includes('Verified') ? '#6ee7b7' : '#cbd5e1');
+        ctx.fillText(l, rx + 40, rry);
+        rry += 28;
+      }
+      break;
+    }
+
+    case 'astra_and_cockpit': {
+      // Left top: Educator Cockpit Live screenshot; Left bottom: Room 10 Dashboard
+      const imgCockpit = imageCache['cockpit'];
+      const imgDash = imageCache['r10_dash'];
+      if (imgCockpit) {
+        ctx.drawImage(imgCockpit, 24, 98, 980, 445);
+        roundRect(24, 98, 980, 445, 12, null, '#38bdf8', 2);
+      }
+      if (imgDash) {
+        ctx.drawImage(imgDash, 24, 565, 980, 450);
+        roundRect(24, 565, 980, 450, 12, null, '#10b981', 2);
+      }
+
+      const rx = 1024, ry = 98, rw = W - rx - 24, rh = 920;
+      roundRect(rx, ry, rw, rh, 14, 'rgba(8, 15, 30, 0.95)', '#c084fc', 1.5);
+      let cy = ry + 30;
+      drawPill(rx + 24, cy, 'SYMBOLICALLY GATED SOCRATIC AI & EDUCATOR COCKPIT', 'rgba(168, 85, 247, 0.2)', '#d8b4fe', '#a855f7', 12);
+      cy += 48;
+      ctx.font = '800 25px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('verify_socratic_hint_gate() Contract', rx + 24, cy);
+      cy += 30;
+
+      const gateBranches = [
+        ['Branch 1: Grounded Entity Check (Regex Word-Boundary)', 'PASS: "What changes if soil moisture is left outside your system boundary?"\nREJECT: "Why did you build a stockpile today?" (\'stockpile\' != \'stock\' -> ungrounded_utterance)', '#10b981'],
+        ['Branch 2: Solution Non-Leakage Guard (Information-Gain Cap)', 'REJECT: "Why not set radius to 3.2 on the boundary right now?"\n-> Blocked: solution_leakage_blocked: contains [\'set radius to 3.2\']', '#f43f5e'],
+        ['Branch 3: Socratic Inquiry Form Enforcement', 'REJECT: "Observe the reservoir and boundary carefully."\n-> Blocked: non_socratic_form: utterance must end with "?"', '#f59e0b'],
+        ['Educator Cockpit & Poetics Multi-Pod Session Isolation', 'Displays per-learner predictions, revisions, hint tiers, and evidence refs while isolating TrainingAssistant state per (venue_id, pod_id, session_id).', '#38bdf8']
+      ];
+      for (const [bTitle, bText, col] of gateBranches) {
+        roundRect(rx + 24, cy, rw - 48, 180, 10, 'rgba(15, 23, 42, 0.92)', col, 1.5);
+        ctx.font = '700 16px Inter, sans-serif';
+        ctx.fillStyle = col;
+        ctx.fillText(bTitle, rx + 40, cy + 32);
+        const lines = bText.split('\n');
+        let ly = cy + 62;
+        for (const ln of lines) {
+          ly = wrapText(ln, rx + 40, ly, rw - 80, 22, '#e2e8f0', '500 14px "JetBrains Mono", monospace') + 6;
+        }
+        cy += 196;
+      }
+      break;
+    }
+
+    case 'tests_and_roadmap': {
+      // Left: 13/13 Unit Test Suite Execution Results; Right: 5-Phase Continuation Roadmap
+      roundRect(24, 98, 920, 920, 14, 'rgba(8, 15, 30, 0.95)', '#10b981', 1.5);
+      roundRect(968, 98, 928, 920, 14, 'rgba(8, 15, 30, 0.95)', '#38bdf8', 1.5);
+
+      drawPill(52, 126, 'VERIFIED TEST SUITE · tests/test_aste_integration.py', 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 13);
+      ctx.font = '800 25px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('13/13 Automated Positive, Negative & UNKNOWN Tests', 52, 182);
+
+      const testLines = [
+        'test_grounded_fact_freshness ........................................ ok',
+        'test_room_1_boundary (TRUE + FALSE counterexample + UNKNOWN) ........ ok',
+        'test_room_2_scale (TRUE + FALSE 24cm² vs 20cm + UNKNOWN) ............ ok',
+        'test_room_3_relationships (TRUE + FALSE Outflow->Stock + UNKNOWN) ... ok',
+        'test_room_4_feedback_delays (TRUE + FALSE premature lag + UNKNOWN) .. ok',
+        'test_room_5_stocks_flows (TRUE + FALSE mass residual + UNKNOWN) ..... ok',
+        'test_room_6_perspectives (TRUE + FALSE missing lenses + UNKNOWN) .... ok',
+        'test_room_7_models (TRUE + FALSE pruned essential + UNKNOWN) ........ ok',
+        'test_room_8_leverage (TRUE + FALSE symptom buffer + UNKNOWN) ........ ok',
+        'test_room_9_emergence (TRUE + FALSE aquifer overdraft + UNKNOWN) .... ok',
+        'test_room_10_observatory (TRUE + FALSE unbacked claim + UNKNOWN) .... ok',
+        'test_garmin_biometric_provenance_and_rmssd_adjacency ................ ok',
+        'test_socratic_hint_gate_all_branches (10 rooms + 3 reject gates) .... ok',
+        '----------------------------------------------------------------------',
+        'Ran 13 tests in 0.001s  —  STATUS: OK (100% Pass)'
+      ];
+      roundRect(52, 210, 864, 520, 10, '#050811', 'rgba(16, 185, 129, 0.45)', 1.5);
+      let ty = 246;
+      for (const tl of testLines) {
+        ctx.font = '600 14px "JetBrains Mono", monospace';
+        ctx.fillStyle = tl.includes('STATUS: OK') ? '#34d399' : (tl.includes('---') ? '#64748b' : '#d1fae5');
+        ctx.fillText(tl, 72, ty);
+        ty += 31;
+      }
+      drawShotFrame('r8', localP, 52, 750, 864, 245, 10);
+
+      // Right: 5-Phase Engineering Continuation Roadmap
+      drawPill(996, 126, 'ENGINEERING CONTINUATION ROADMAP · ROADMAP.md', 'rgba(14, 165, 233, 0.2)', '#38bdf8', '#0ea5e9', 13);
+      ctx.font = '800 25px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Five-Phase Integration Plan (Weeks 1–20)', 996, 182);
+      const phases = [
+        ['Phase 1 (Wks 1–3): Shared Ontology & Room Verifiers [COMPLETED + EXTENDING]', 'Implemented `src/integration/aste.py` & `tests/test_aste_integration.py`; next: `ontologies/aste_systems.owl` & hosted JSON-LD context on `aste.iliachry.gr`.', '#10b981'],
+        ['Phase 2 (Wks 3–7): Real-Time WebXR Grounding Service', 'WebSocket/FastAPI bridge streaming Three.js 6DoF poses & stock-flow states in virtual mode and 3DGS→SAM2→CLIP in physical LBVR venues.', '#38bdf8'],
+        ['Phase 3 (Wks 7–11): Biometric-Aware Symbolic Layer', 'Connect `BiometricPacket` (`LIVE` adjacent-beat RMSSD) to Prolog cognitive-load rules and Z3 adaptive puzzle scheduling with unsat-core explanations.', '#a855f7'],
+        ['Phase 4 (Wks 11–15): GX10 Blackwell LLM + Symbolic Astra Gate', 'Condition Qwen3.6-35B-A3B Socratic generation on `violated_rules[]`, filtered deterministically by `verify_socratic_hint_gate()`.', '#f59e0b'],
+        ['Phase 5 (Wks 15–20): Multi-Pod Poetics LBVR Trials & Evaluation', 'Per-session state isolation across school pods + empirical pre/post Arnold & Wade systems thinking evaluation.', '#ec4899']
+      ];
+      let py = 210;
+      for (const [pTitle, pDesc, col] of phases) {
+        roundRect(996, py, 872, 145, 10, 'rgba(15, 23, 42, 0.92)', col, 1.5);
+        ctx.font = '700 16px Inter, sans-serif';
+        ctx.fillStyle = col;
+        ctx.fillText(pTitle, 1018, py + 32);
+        wrapText(pDesc, 1018, py + 60, 830, 22, '#e2e8f0', '400 14px Inter, sans-serif');
+        py += 158;
+      }
+      break;
+    }
+
+    case 'verified_references': {
+      roundRect(24, 98, W - 48, 920, 14, 'rgba(8, 15, 30, 0.96)', '#38bdf8', 1.8);
+      drawPill(56, 130, 'ZERO FABRICATED URLS · 100% ONLINE VERIFIED MANIFEST', 'rgba(16, 185, 129, 0.2)', '#34d399', '#10b981', 13);
+      ctx.font = '800 30px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Verified Repositories, Live WebXR Deployment & Peer-Reviewed DOIs', 56, 190);
+
+      const refs = [
+        ['Public Source Repository (HTTP 200 Verified)', 'https://github.com/iliachry/neurosymbolic-xr', 'Complete Python implementation (`src/integration/aste.py`, `tests/test_aste_integration.py`, `ROADMAP.md`, `VIDEO_SCRIPT_10MIN.md`).', '#38bdf8'],
+        ['Live Embodied WebXR Platform (HTTP 200 Verified)', 'https://aste.iliachry.gr', 'Adaptive Systems Thinking Escape Ecology (10 WebXR Escape Chambers, H.F.R.I. Grant No. 26237 — EduGenZ).', '#10b981'],
+        ['Arnold, R. D., & Wade, J. P. (2015) · Procedia Computer Science, 44, 669–678', 'https://doi.org/10.1016/j.procs.2015.03.050', 'A Definition of Systems Thinking: A Systems Approach (Foundational systems thinking definition).', '#c084fc'],
+        ['Arnold, R. D., & Wade, J. P. (2017) · INSIGHT, 20(3), 9–17', 'https://doi.org/10.1002/inst.12159', 'A Complete Set of Systems Thinking Skills (Foundational skill taxonomy operationalized across Rooms 1–10).', '#c084fc'],
+        ['ExpertAssist (2026) · Computers & Education: X Reality', 'https://doi.org/10.1016/j.cexr.2026.100155', 'Peer-reviewed XR training & intelligent assistance reference architecture.', '#fbbf24'],
+        ['Metaverse Framework for Wireless Systems Management (2026) · IEEE IoT Magazine', 'https://doi.org/10.1109/MIOT.2026.3680843', ' spatial computing & real-time telemetry synchronization reference.', '#fbbf24'],
+        ['Less is More: Networked VR Transformation Handling Using Geometric Algebra (2022)', 'https://doi.org/10.1007/s00006-022-01253-9', 'Advances in Applied Clifford Algebras — high-efficiency 6DoF VR state representation.', '#fbbf24']
+      ];
+      let ry = 225;
+      for (const [rTitle, rUrl, rDesc, col] of refs) {
+        roundRect(56, ry, W - 112, 102, 10, 'rgba(15, 23, 42, 0.94)', col, 1.4);
+        ctx.font = '700 17px Inter, sans-serif';
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(rTitle, 80, ry + 30);
+        ctx.font = '700 16px "JetBrains Mono", monospace';
+        ctx.fillStyle = col;
+        ctx.fillText(rUrl, 80, ry + 56);
+        ctx.font = '400 14px Inter, sans-serif';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText(rDesc, 80, ry + 82);
+        ry += 110;
+      }
+      break;
+    }
+
+    case 'closing_card': {
+      drawShotFrame('r10', localP, 24, 98, W - 48, 920, 16);
+      roundRect(220, 220, W - 440, 640, 20, 'rgba(5, 10, 24, 0.92)', '#38bdf8', 2.5);
+      drawPill(W / 2 - 210, 270, 'NEUROSYMBOLIC XR FRAMEWORK × ASTE VR', 'rgba(14, 165, 233, 0.25)', '#38bdf8', '#0ea5e9', 15);
+      ctx.textAlign = 'center';
+      ctx.font = '900 54px Inter, sans-serif';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText('Where Neural Perception Meets', W / 2, 390);
+      ctx.fillStyle = '#34d399';
+      ctx.fillText('Formal Symbolic Verification in XR', W / 2, 460);
+
+      ctx.font = '700 26px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('https://github.com/iliachry/neurosymbolic-xr', W / 2, 565);
+      ctx.fillStyle = '#34d399';
+      ctx.fillText('https://aste.iliachry.gr', W / 2, 615);
+
+      ctx.font = '500 18px Inter, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('10 Embodied Systems Thinking Escape Rooms · Garmin BLE Provenance · Symbolically Gated Astra AI', W / 2, 700);
+      ctx.fillText('H.F.R.I. Grant No. 26237 (EduGenZ) · Arnold & Wade (2015, 2017) Taxonomy', W / 2, 738);
+      ctx.textAlign = 'left';
+      break;
+    }
+  }
+}
+
+window.renderAtTime = function(t) {
+  ctx.fillStyle = '#050914';
+  ctx.fillRect(0, 0, W, H);
+
+  let active = SCENES[0];
+  for (const s of SCENES) {
+    if (t >= s.start && t < s.end) {
+      active = s;
+      break;
+    }
+  }
+  if (t >= 600.0) active = SCENES[SCENES.length - 1];
+
+  const dur = Math.max(0.001, active.end - active.start);
+  const localP = Math.max(0, Math.min(1, (t - active.start) / dur));
+
+  drawTopBar(t, active);
+  renderScene(t, active, localP);
+  drawBottomTimeline(t, active);
+};
+</script>
+</body>
+</html>

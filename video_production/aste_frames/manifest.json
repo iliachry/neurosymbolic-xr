@@ -1,0 +1,887 @@
+{
+  "fps": 24,
+  "frames_per_shot": 16,
+  "shots": [
+    {
+      "index": 0,
+      "id": "intro",
+      "room": 1,
+      "duration": 6.5,
+      "files": [
+        "intro_00.jpg",
+        "intro_01.jpg",
+        "intro_02.jpg",
+        "intro_03.jpg",
+        "intro_04.jpg",
+        "intro_05.jpg",
+        "intro_06.jpg",
+        "intro_07.jpg",
+        "intro_08.jpg",
+        "intro_09.jpg",
+        "intro_10.jpg",
+        "intro_11.jpg",
+        "intro_12.jpg",
+        "intro_13.jpg",
+        "intro_14.jpg",
+        "intro_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/2 \u00b7 EXPEDITION OVERVIEW",
+          "target": "Constellation Holosphere [Curriculum Hub]",
+          "action": "Press [M] to open Curriculum Expedition Map; move mouse to explore",
+          "goal": "Review 10 escape chambers training 15 systems thinking competencies",
+          "astra": "Welcome, educator. Ten ancient chambers await, each embodying a core systems thinking discipline.",
+          "competency": "CURRICULUM MAPPING (ARNOLD & WADE 2015)",
+          "status": "CONSTELLATION MAP",
+          "keys": [
+            "M",
+            "mouse"
+          ]
+        },
+        {
+          "t": 3.2,
+          "beat": "BEAT 2/2 \u00b7 FIRST-PERSON INTERACTION PARADIGM",
+          "target": "Chamber Entryway [Chamber 1 Portal]",
+          "action": "Navigate with [W][A][S][D], aim with mouse, press [E] / Click on beacons",
+          "goal": "Restore dynamic equilibrium in each room to unlock the exit portal",
+          "astra": "Every room responds to your choices. Locate the beacons, test hypotheses, and stabilize the system.",
+          "competency": "EMBODIED COGNITION & 6DOF VR",
+          "status": "READY TO PLAY",
+          "keys": [
+            "W",
+            "mouse",
+            "E",
+            "click"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "id": "r1",
+      "room": 1,
+      "duration": 14,
+      "files": [
+        "r1_00.jpg",
+        "r1_01.jpg",
+        "r1_02.jpg",
+        "r1_03.jpg",
+        "r1_04.jpg",
+        "r1_05.jpg",
+        "r1_06.jpg",
+        "r1_07.jpg",
+        "r1_08.jpg",
+        "r1_09.jpg",
+        "r1_10.jpg",
+        "r1_11.jpg",
+        "r1_12.jpg",
+        "r1_13.jpg",
+        "r1_14.jpg",
+        "r1_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH & PROBLEM IDENTIFICATION",
+          "target": "Water Tank Dais [Vernier Handwheel]",
+          "action": "Press [W] to approach central dais marked by cyan beacon; aim mouse",
+          "goal": "Diagnose system imbalance: reservoir stock drains without compensatory inflow",
+          "astra": "Notice how the reservoir depletes. Before regulating flow, we must delineate the system boundary.",
+          "competency": "SKILL 2.1: RECOGNIZE SYSTEMS",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.6,
+          "beat": "BEAT 2/4 \u00b7 SYSTEM BOUNDARY DELINEATION",
+          "target": "Vernier Handwheel [Central Dais, Z = -2.0m]",
+          "action": "Aim reticle at Handwheel -> Press [E] or Left Click to rotate",
+          "goal": "Widen boundary radius from 2.2m to 3.2m (Integrity rises from 67% to 100%)",
+          "astra": "Widening the boundary brings soil moisture and the garden bed into the system, while the bell and birdsong stay outside.",
+          "competency": "SKILL 2.2: MAINTAIN BOUNDARIES",
+          "status": "EXPANDING BOUNDARY",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5.6,
+          "beat": "BEAT 3/4 \u00b7 STOCK EQUILIBRIUM REGULATION",
+          "target": "Inflow Valve Lever [Right Dais, X = +7.5m]",
+          "action": "Turn right to Inflow Lever -> Press [E] to engage fluid valve",
+          "goal": "Equate inflow and outflow rates; stock stabilizes at target (70 units)",
+          "astra": "Match the inflow to the 6.0 outflow: when the two flows are equal the stock stops moving.",
+          "competency": "SKILL 2.3: QUANTIFY ELEMENTS",
+          "status": "REGULATING FLOW",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 7.6,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Walk forward through the illuminated arch corridor into the warp portal",
+          "goal": "Transit through the unsealed portal to Room 2: Hall of Scale",
+          "astra": "Chamber complete! The airlock has unsealed. Step into the portal when ready.",
+          "competency": "SYSTEMS MASTERY: EQUILIBRIUM",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "id": "r2",
+      "room": 2,
+      "duration": 14,
+      "files": [
+        "r2_00.jpg",
+        "r2_01.jpg",
+        "r2_02.jpg",
+        "r2_03.jpg",
+        "r2_04.jpg",
+        "r2_05.jpg",
+        "r2_06.jpg",
+        "r2_07.jpg",
+        "r2_08.jpg",
+        "r2_09.jpg",
+        "r2_10.jpg",
+        "r2_11.jpg",
+        "r2_12.jpg",
+        "r2_13.jpg",
+        "r2_14.jpg",
+        "r2_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH EXPERIMENT CONSOLE",
+          "target": "Deceptive Cubes Table [Left Pedestal]",
+          "action": "Navigate left toward the scale console using [W][A] and mouse",
+          "goal": "Diagnose false equivalence: comparing discrete units vs continuous magnitudes",
+          "astra": "Systems operate across multiple scales. We must distinguish discrete counts from continuous volume.",
+          "competency": "SKILL 2.3: SCALE DIFFERENTIATION",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "A",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.6,
+          "beat": "BEAT 2/4 \u00b7 QUANTIFY DISCRETE ELEMENTS",
+          "target": "Deceptive Volume Cube [Left Table, X = -5.3m]",
+          "action": "Aim reticle at Deceptive Cube -> Press [E] to count discrete volume elements",
+          "goal": "Categorize unit dimensions; prevent false equivalences between dimensions",
+          "astra": "Categorical classification prevents false equivalences between unlike dimensions.",
+          "competency": "SKILL 2.3: CATEGORICAL CLASSIFICATION",
+          "status": "QUANTIFYING UNITS",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5.6,
+          "beat": "BEAT 3/4 \u00b7 REJECT FALSE COMPARISONS",
+          "target": "False Comparison Plunger [Center Table]",
+          "action": "Aim at Plunger -> Press [E] to reject comparing unlike units (cm\u00b2 vs cm)",
+          "goal": "Scale balance tilts into alignment; Measurement Coherence reaches 120 Units",
+          "astra": "Measurement coherence verified! Never compare surface area directly with linear length.",
+          "competency": "SKILL 1.4: DIMENSIONAL HARMONY",
+          "status": "CALIBRATING SCALE",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 8.4,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Walk forward through the unsealed doorway into the airlock warp portal",
+          "goal": "Transit to Room 3: River of Relationships",
+          "astra": "Scale Coherence verified! The exit doorway has opened.",
+          "competency": "SYSTEMS MASTERY: SCALE",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "id": "r3",
+      "room": 3,
+      "duration": 16,
+      "files": [
+        "r3_00.jpg",
+        "r3_01.jpg",
+        "r3_02.jpg",
+        "r3_03.jpg",
+        "r3_04.jpg",
+        "r3_05.jpg",
+        "r3_06.jpg",
+        "r3_07.jpg",
+        "r3_08.jpg",
+        "r3_09.jpg",
+        "r3_10.jpg",
+        "r3_11.jpg",
+        "r3_12.jpg",
+        "r3_13.jpg",
+        "r3_14.jpg",
+        "r3_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH CAUSAL STREAM",
+          "target": "Mediator Node Altar [River Sluice]",
+          "action": "Walk toward the Mediator Node altar in the glowing causal river using [W]",
+          "goal": "Diagnose network break: variables A and C are disconnected without intermediary B",
+          "astra": "In complex networks, direct causation is rare. We need to identify intermediary variables.",
+          "competency": "SKILL 3.1: CAUSAL NETWORKS",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.6,
+          "beat": "BEAT 2/4 \u00b7 INSERT MEDIATOR NODE",
+          "target": "Mediator Crystal Socket [Left Altar, X = -1.8m]",
+          "action": "Aim reticle at Mediator Crystal -> Press [E] to bridge disconnected variables",
+          "goal": "Indirect chains mediate closed feedback loops and establish system connectivity",
+          "astra": "The mediator node bridges the gap, allowing systemic feedback to propagate.",
+          "competency": "SKILL 3.1: INDIRECT CAUSALITY",
+          "status": "BRIDGING FEEDBACK",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5,
+          "beat": "BEAT 3/4 \u00b7 FIX THE POLARITY, THEN PULSE",
+          "target": "Outflow \u2192 Stock Polarity Badge [over the river, X = +3.8m] & Pulse Staff [X = +1.5m]",
+          "action": "Aim at the hexagonal badge reading [+] -> Press [E] to flip it to [\u2212]; then aim at the Pulse Staff -> Press [E]",
+          "goal": "More outflow means less stock: the Outflow \u2192 Stock thread is balancing (\u2212). At 100% coherence the pulse resonates",
+          "astra": "More outflow means less stock. Mark that thread minus, then send the pulse.",
+          "competency": "SKILL 3.2: BALANCING FEEDBACK",
+          "status": "CORRECTING POLARITY",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 9.6,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Network Equilibrium achieved! Walk forward into the airlock warp portal",
+          "goal": "Transit to Room 4: Echo Forest",
+          "astra": "Network Equilibrium locked! The river flows in smooth laminar harmony.",
+          "competency": "SYSTEMS MASTERY: RELATIONSHIPS",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "id": "r4",
+      "room": 4,
+      "duration": 14.5,
+      "files": [
+        "r4_00.jpg",
+        "r4_01.jpg",
+        "r4_02.jpg",
+        "r4_03.jpg",
+        "r4_04.jpg",
+        "r4_05.jpg",
+        "r4_06.jpg",
+        "r4_07.jpg",
+        "r4_08.jpg",
+        "r4_09.jpg",
+        "r4_10.jpg",
+        "r4_11.jpg",
+        "r4_12.jpg",
+        "r4_13.jpg",
+        "r4_14.jpg",
+        "r4_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 ENTER CANOPY ECOSYSTEM",
+          "target": "Living Root Network [Cybernetic Tree]",
+          "action": "Walk forward into the living root network using [W][A][S][D]",
+          "goal": "Diagnose systemic lag: actions take effect with delayed feedback, causing overshoot",
+          "astra": "Cause and effect are separated in time. If you ignore delays, you will overshoot the goal.",
+          "competency": "SKILL 3.4: SYSTEMIC DELAYS",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 3.4,
+          "beat": "BEAT 2/4 \u00b7 TUNE DELAY COMPENSATION",
+          "target": "Rotary Delay Dial [Right Root Trunk, X = +2.2m]",
+          "action": "Aim at Rotary Delay Dial -> Press [E] to calibrate lag compensation (+1.5s)",
+          "goal": "Damp phase lag; align sensor readings with delayed physical nutrient absorption",
+          "astra": "Compensating for delay eliminates wild oscillations before they destabilize the forest.",
+          "competency": "SKILL 3.4: LAG COMPENSATION",
+          "status": "TUNING DELAY",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 8,
+          "beat": "BEAT 3/4 \u00b7 DAMP REINFORCING EXPONENTIALS",
+          "target": "Damping Ward Crystal [Deep Canopy Pedestal, Z = -6.0m]",
+          "action": "Aim at central Damping Ward Crystal -> Press [E] to absorb runaway pulse",
+          "goal": "Damping reinforcing loop restores balance; Ecosystem Stability reaches 142",
+          "astra": "Exponential explosion curbed! The canopy flourishes in sustained equilibrium.",
+          "competency": "SKILL 3.3: DAMPING REINFORCING LOOPS",
+          "status": "DAMPING GROWTH",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 10,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Canopy bridge active! Walk through the airlock transit corridor into the portal",
+          "goal": "Transit to Room 5: Valley of Time",
+          "astra": "Canopy ecosystem stabilized! The transit bridge has raised.",
+          "competency": "SYSTEMS MASTERY: DELAYS",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "id": "r5",
+      "room": 5,
+      "duration": 14,
+      "files": [
+        "r5_00.jpg",
+        "r5_01.jpg",
+        "r5_02.jpg",
+        "r5_03.jpg",
+        "r5_04.jpg",
+        "r5_05.jpg",
+        "r5_06.jpg",
+        "r5_07.jpg",
+        "r5_08.jpg",
+        "r5_09.jpg",
+        "r5_10.jpg",
+        "r5_11.jpg",
+        "r5_12.jpg",
+        "r5_13.jpg",
+        "r5_14.jpg",
+        "r5_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH TEMPORAL CONSOLE",
+          "target": "Chronos Temporal Lens [Center Console]",
+          "action": "Walk forward to the temporal timeline console marked by the amber beacon using [W]",
+          "goal": "Diagnose path dependency: past accumulation locks future trajectories into place",
+          "astra": "Time is non-linear in systems. Past stock accumulations dictate future path dependency.",
+          "competency": "SKILL 4.1: TEMPORAL TRAJECTORIES",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 3.2,
+          "beat": "BEAT 2/4 \u00b7 SCRUB TIME TRAJECTORY",
+          "target": "Scrubber Handle [Chronos Lens, Center]",
+          "action": "Aim at Scrubber Handle -> Press [E] / Click & drag to project system states",
+          "goal": "Forecasting reveals critical tipping points and delayed accumulation curves",
+          "astra": "Scrubbing the timeline reveals tipping points hidden in short-term data.",
+          "competency": "SKILL 4.1: SCENARIO PROJECTION",
+          "status": "SCRUBBING TIMELINE",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5.6,
+          "beat": "BEAT 3/4 \u00b7 SECURE TRAJECTORY RESILIENCE",
+          "target": "Chronos Lens [Center Pedestal, Z = -5.5m]",
+          "action": "Aim at the Chronos Lens -> Press [E] to project how past accumulations lock future resilience",
+          "goal": "Trajectory resilience verified at 100%; the Trajectory Reservoir then has to reach 90 units",
+          "astra": "Resilience secured! The system can now absorb unexpected environmental shocks.",
+          "competency": "SKILL 4.2: SYSTEM RESILIENCE",
+          "status": "RESILIENCE SECURED",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 7.6,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Temporal equilibrium locked! Walk forward through the airlock corridor into portal",
+          "goal": "Transit to Room 6: Prism Mountain",
+          "astra": "Temporal stability achieved! Proceed through the unsealed archway.",
+          "competency": "SYSTEMS MASTERY: TIME",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "id": "r6",
+      "room": 6,
+      "duration": 14,
+      "files": [
+        "r6_00.jpg",
+        "r6_01.jpg",
+        "r6_02.jpg",
+        "r6_03.jpg",
+        "r6_04.jpg",
+        "r6_05.jpg",
+        "r6_06.jpg",
+        "r6_07.jpg",
+        "r6_08.jpg",
+        "r6_09.jpg",
+        "r6_10.jpg",
+        "r6_11.jpg",
+        "r6_12.jpg",
+        "r6_13.jpg",
+        "r6_14.jpg",
+        "r6_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 SUMMIT PEDESTAL APPROACH",
+          "target": "Perspective Refraction Prism [Summit Pedestal]",
+          "action": "Approach the optical perspective prism on the mountain summit using [W]",
+          "goal": "Diagnose stakeholder misalignment: pupil, teacher, and policymaker perspectives diverge",
+          "astra": "No single stakeholder sees the whole system. We must refract perspectives to find alignment.",
+          "competency": "SKILL 1.1: PERSPECTIVE TAKING",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.6,
+          "beat": "BEAT 2/4 \u00b7 ROTATE PERSPECTIVE PRISM",
+          "target": "Multi-Faceted Prism [Summit Dais, Z = -2.0m]",
+          "action": "Aim at Prism -> Press [E] three times: Teacher, Designer and Pupil views, each with its own concern",
+          "goal": "Refracting pupil, teacher, and curriculum designer viewpoints",
+          "astra": "Each facet reveals a valid mental model. Watch the optical beams bend.",
+          "competency": "SKILL 1.1: MULTI-FACETED MODELS",
+          "status": "REFRACTING BEAMS",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 4,
+          "beat": "BEAT 3/4 \u00b7 CONVERGENCE RECEPTOR ALIGNMENT",
+          "target": "Multi-Faceted Prism [Summit Dais] -> beams converge on the Receptor [Doorway Lintel, Z = -11.4m]",
+          "action": "Align refracted perspective beams squarely onto the rear convergence target",
+          "goal": "Perspective Synthesis reaches 100%! Stakeholder convergence completes optical circuit",
+          "astra": "Three concerns, one system. When all perspectives converge, the true systemic leverage emerges.",
+          "competency": "SKILL 1.2: STAKEHOLDER SYNTHESIS",
+          "status": "SYNTHESIS 100%",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 5.7,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Spectral gate unlocked! Walk forward through the airlock corridor into the portal",
+          "goal": "Transit to Room 7: Garden of Models",
+          "astra": "Perspective Synthesis locked! The spectral airlock has unsealed.",
+          "competency": "SYSTEMS MASTERY: PERSPECTIVE",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "id": "r7",
+      "room": 7,
+      "duration": 14,
+      "files": [
+        "r7_00.jpg",
+        "r7_01.jpg",
+        "r7_02.jpg",
+        "r7_03.jpg",
+        "r7_04.jpg",
+        "r7_05.jpg",
+        "r7_06.jpg",
+        "r7_07.jpg",
+        "r7_08.jpg",
+        "r7_09.jpg",
+        "r7_10.jpg",
+        "r7_11.jpg",
+        "r7_12.jpg",
+        "r7_13.jpg",
+        "r7_14.jpg",
+        "r7_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH FRACTAL BONSAI",
+          "target": "Living Fractal Bonsai Tree [Center Dais]",
+          "action": "Move toward the living fractal bonsai tree model; the orange beacon marks its noise branches [W]",
+          "goal": "Diagnose over-complication: excessive descriptive detail obscures core feedback loops",
+          "astra": "All models are wrong, but some are useful. We must prune noise to reveal essence.",
+          "competency": "SKILL 1.5: MODEL PARSIMONY",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.6,
+          "beat": "BEAT 2/4 \u00b7 PRUNE REDUNDANT BRANCHES",
+          "target": "\"Superficial Noise\" Branch [Bonsai Tree, X = +2.2m, 3.6m up]",
+          "action": "Aim reticle at a noise branch (not a core variable) -> Press [E] to prune it; \"Spurious Trend\" is pruned the same way",
+          "goal": "Eliminating extraneous detail highlights the core feedback loops governing behavior",
+          "astra": "Pruning extraneous variables clarifies the feedback structure.",
+          "competency": "SKILL 1.5: VARIABLE ABSTRACTION",
+          "status": "PRUNING MODEL",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 4.6,
+          "beat": "BEAT 3/4 \u00b7 PRUNE THE SECOND NOISE BRANCH, THEN THE DIAL",
+          "target": "\"Spurious Trend\" Branch [Bonsai Tree, 4.9m up] -> Abstraction Dial [Front Console, Center, Z = -2.0m]",
+          "action": "Look up to \"Spurious Trend\" -> Press [E] to prune it; then turn to the Abstraction Dial (tier 3, over-complex) -> Press [E] to turn it down to tier 2",
+          "goal": "Goal: both noise branches gone, core variables kept, tier 2 chosen \u2014 Model Adequacy at 110 units",
+          "astra": "One noise variable left: prune it, keep the three core variables, then turn the dial down to the economical tier.",
+          "competency": "SKILL 1.3: MODEL ADEQUACY",
+          "status": "PRUNING & CALIBRATING",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 8.9,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Model validated! Walk forward through the airlock transit corridor into portal",
+          "goal": "Transit to Room 8: The Seed of Change",
+          "astra": "Parsimonious model validated! The portal is open.",
+          "competency": "SYSTEMS MASTERY: MODELS",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "id": "r8",
+      "room": 8,
+      "duration": 14,
+      "files": [
+        "r8_00.jpg",
+        "r8_01.jpg",
+        "r8_02.jpg",
+        "r8_03.jpg",
+        "r8_04.jpg",
+        "r8_05.jpg",
+        "r8_06.jpg",
+        "r8_07.jpg",
+        "r8_08.jpg",
+        "r8_09.jpg",
+        "r8_10.jpg",
+        "r8_11.jpg",
+        "r8_12.jpg",
+        "r8_13.jpg",
+        "r8_14.jpg",
+        "r8_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH SEED PEDESTAL",
+          "target": "Golden Seed Pedestal [Center Dais]",
+          "action": "Move forward toward the high-leverage seed pedestal using [W]",
+          "goal": "Diagnose leverage levels: adjusting parameters has low impact; structural shifts transform systems",
+          "astra": "Donella Meadows taught us: small changes at the root produce massive system-wide transformation.",
+          "competency": "SKILL 4.4: LEVERAGE POINTS (MEADOWS 1999)",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 3,
+          "beat": "BEAT 2/4 \u00b7 ACQUIRE SYSTEMIC SEED",
+          "target": "Golden Systemic Seed [Center Dais, Z = -2.0m]",
+          "action": "Aim at the Golden Seed -> Press [E] or Left Click to acquire intervention catalyst",
+          "goal": "Identifying high-leverage paradigm shifts over low-leverage parameter tweaks",
+          "astra": "Catalyst acquired! Now identify where in the structural network this seed will have maximum leverage.",
+          "competency": "SKILL 4.4: PARADIGM SHIFT",
+          "status": "CATALYST ACQUIRED",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5,
+          "beat": "BEAT 3/4 \u00b7 INSERT AT STRUCTURAL LEVERAGE",
+          "target": "Structural Matrix Socket [Right Socket, X = +0.65m]",
+          "action": "Turn right to structural socket -> Press [E] to insert seed at system root",
+          "goal": "Systemic Leverage Amplification reaches 150%! Structural matrix transforms",
+          "astra": "Structural transformation cascading! The rules of the system have evolved.",
+          "competency": "SKILL 4.3: STRUCTURAL INTERVENTION",
+          "status": "TRANSFORMING SYSTEM",
+          "keys": [
+            "E",
+            "click"
+          ]
+        },
+        {
+          "t": 6.8,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Structural transformation complete! Walk forward through airlock into Room 9",
+          "goal": "Transit to Room 9: The Emergence Chamber",
+          "astra": "System transformed! Step into the unsealed airlock portal.",
+          "competency": "SYSTEMS MASTERY: LEVERAGE",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "id": "r9",
+      "room": 9,
+      "duration": 14,
+      "files": [
+        "r9_00.jpg",
+        "r9_01.jpg",
+        "r9_02.jpg",
+        "r9_03.jpg",
+        "r9_04.jpg",
+        "r9_05.jpg",
+        "r9_06.jpg",
+        "r9_07.jpg",
+        "r9_08.jpg",
+        "r9_09.jpg",
+        "r9_10.jpg",
+        "r9_11.jpg",
+        "r9_12.jpg",
+        "r9_13.jpg",
+        "r9_14.jpg",
+        "r9_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 APPROACH INDUSTRIAL PIPELINE",
+          "target": "Municipal Pipeline Network [Chamber Grid]",
+          "action": "Use [W] to approach the high-pressure pipeline network marked by the beacon",
+          "goal": "Diagnose complex emergence: local pipeline leaks trigger global pressure collapse",
+          "astra": "Emergence means the whole is greater than the sum of parts. Local leaks threaten global collapse.",
+          "competency": "SKILL 1.1\u20134.4: COMPLEX EMERGENCE",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 3.2,
+          "beat": "BEAT 2/4 \u00b7 CLAMP MUNICIPAL LEAK",
+          "target": "Coupling Joint [Floor Pipeline, Z = -4.5m]",
+          "action": "Aim reticle at leaking pipe -> Press [E] to clamp coupling and stop fluid loss",
+          "goal": "Preventing non-linear failure cascades: local leaks compromise global integrity",
+          "astra": "Coupling sealed! Halting fluid loss prevents catastrophic pressure drop.",
+          "competency": "SKILL 4.3: POLICY & INTERVENTION",
+          "status": "SEALING LEAK",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 6,
+          "beat": "BEAT 3/4 \u00b7 VENT OVERHEAD PRESSURE SURGE",
+          "target": "Pressure Relief Valve [Overhead Gantry, Y = +2.6m]",
+          "action": "Look up at overhead Pressure Relief Valve -> Press [E] to vent excess accumulation",
+          "goal": "Systemic Integrity restored to 100%! Flow network returns to stable laminar regime",
+          "astra": "Pressure equalized! Laminar flow restored throughout the municipal grid.",
+          "competency": "SKILL 3.2: DYNAMIC RELATIONSHIPS",
+          "status": "VENTING SURGE",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 8,
+          "beat": "BEAT 4/4 \u00b7 EQUILIBRIUM DWELL & AIRLOCK TRANSIT",
+          "target": "Airlock Transit Corridor [Z = -11.6m to -18.0m]",
+          "action": "Industrial network stabilized! Walk forward into the final observatory portal",
+          "goal": "Transit to Room 10: Reflection Observatory",
+          "astra": "Network stabilized! Proceed to the final observatory chamber.",
+          "competency": "SYSTEMS MASTERY: EMERGENCE",
+          "status": "\u2714 EQUILIBRIUM ACHIEVED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "id": "r10",
+      "room": 10,
+      "duration": 15,
+      "files": [
+        "r10_00.jpg",
+        "r10_01.jpg",
+        "r10_02.jpg",
+        "r10_03.jpg",
+        "r10_04.jpg",
+        "r10_05.jpg",
+        "r10_06.jpg",
+        "r10_07.jpg",
+        "r10_08.jpg",
+        "r10_09.jpg",
+        "r10_10.jpg",
+        "r10_11.jpg",
+        "r10_12.jpg",
+        "r10_13.jpg",
+        "r10_14.jpg",
+        "r10_15.jpg"
+      ],
+      "tutorial": [
+        {
+          "t": 0,
+          "beat": "BEAT 1/4 \u00b7 ENTER OBSERVATORY DAIS",
+          "target": "Celestial Galaxy Dome [Observatory Dais]",
+          "action": "Walk onto the central dais using [W] under the celestial galaxy dome",
+          "goal": "Metacognitive consolidation: reviewing growth across all 15 systems thinking competencies",
+          "astra": "Here in the observatory, we look back across the entire expedition and synthesize our learning.",
+          "competency": "METACOGNITIVE CONSOLIDATION",
+          "status": "NAVIGATING",
+          "keys": [
+            "W",
+            "mouse"
+          ]
+        },
+        {
+          "t": 2.8,
+          "beat": "BEAT 2/4 \u00b7 INSPECT LEARNER DIGITAL TWIN",
+          "target": "Digital Twin Console [Center Dais, Z = -1.2m]",
+          "action": "Aim at Digital Twin Console -> Press [E] to inspect learning telemetry and passport",
+          "goal": "Synthesizing biometric composure, decision latency, and mental model refinement",
+          "astra": "Your digital twin reflects your composure, decision speed, and systems mastery.",
+          "competency": "LEARNER TELEMETRY & DIGITAL TWIN",
+          "status": "REVIEWING TELEMETRY",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 5.6,
+          "beat": "BEAT 3/4 \u00b7 SYNTHESIZE ALL 15 COMPETENCIES",
+          "target": "Metacognitive Synthesis Dial [Center Dais]",
+          "action": "Aim at Metacognitive Synthesis Crystal -> Press [E] to synchronize all 10 chambers",
+          "goal": "All 15 Arnold & Wade systems competencies illuminate across the celestial dome",
+          "astra": "Every loop, stock, delay, and perspective now resonates in perfect harmony.",
+          "competency": "ALL 15 SYSTEMS COMPETENCIES",
+          "status": "SYNTHESIZING KNOWLEDGE",
+          "keys": [
+            "E",
+            "click",
+            "mouse"
+          ]
+        },
+        {
+          "t": 8.1,
+          "beat": "BEAT 4/4 \u00b7 EXPEDITION COMPLETE & MASTERY",
+          "target": "Infinite Horizon Synthesis Portal [Z = -18.0m]",
+          "action": "Living Mathematics Ecosystem mastered! Walk forward into the infinite horizon portal",
+          "goal": "EduGenZ ASTE Serious Game fully verified and ready for classroom intervention",
+          "astra": "Congratulations! You are now an embodied systems thinker ready to transform education.",
+          "competency": "MASTER OF SYSTEMS THINKING",
+          "status": "\ud83c\udfc6 EXPEDITION MASTERED",
+          "keys": [
+            "W"
+          ]
+        }
+      ]
+    }
+  ]
+}

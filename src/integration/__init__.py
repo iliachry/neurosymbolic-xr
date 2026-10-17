@@ -2,19 +2,43 @@
 Integration Layer
 
 This module contains platform integrations:
-- poetics: Poetics VR platform integration
+- aste: ASTE VR (https://aste.iliachry.gr) neurosymbolic verification & biometric provenance
+- poetics: Poetics VR venue management platform integration
 """
 
-from .poetics import (
-    PoeticsIntegration,
-    VenueContext,
-    SessionContext,
-    create_poetics_integration
+from .aste import (
+    ASTENeurosymbolicVerifier,
+    BiometricPacket,
+    BiometricProvenance,
+    GroundedFact,
+    RoomVerificationResult,
+    TruthValue,
 )
 
 __all__ = [
-    'PoeticsIntegration',
-    'VenueContext',
-    'SessionContext',
-    'create_poetics_integration',
+    "ASTENeurosymbolicVerifier",
+    "BiometricPacket",
+    "BiometricProvenance",
+    "GroundedFact",
+    "RoomVerificationResult",
+    "TruthValue",
 ]
+
+try:
+    from .poetics import (
+        PoeticsIntegration,
+        SessionContext,
+        VenueContext,
+        create_poetics_integration,
+    )
+
+    __all__.extend(
+        [
+            "PoeticsIntegration",
+            "VenueContext",
+            "SessionContext",
+            "create_poetics_integration",
+        ]
+    )
+except ImportError:
+    pass
